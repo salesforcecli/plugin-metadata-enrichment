@@ -14,4 +14,11 @@
  * limitations under the License.
  */
 
-export default {};
+export type MetadataTypeAndMetadataName = {
+  type: string;
+  componentName?: string;
+};
+
+export type ComponentEnrichmentStatus = MetadataTypeAndMetadataName & {
+  reason: string;
+};

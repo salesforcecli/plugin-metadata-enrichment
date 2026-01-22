@@ -14,4 +14,15 @@
  * limitations under the License.
  */
 
-export default {};
+export { getMimeTypeFromExtension, EnrichmentHandler } from './enrichmentHandler.js';
+export { ENDPOINT_ENRICHMENT, MIME_TYPES } from './constants.js';
+export { EnrichmentMetrics } from './enrichmentMetrics.js';
+export type {
+  ContentBundleFile,
+  ContentBundle,
+  EnrichmentRequestBody,
+  EnrichmentMetadata,
+  EnrichmentResult,
+  EnrichMetadataResult,
+  EnrichmentRequestRecord,
+} from './enrichmentHandler.js';
