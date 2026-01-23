@@ -17,8 +17,8 @@
 import { Messages, SfProject } from '@salesforce/core';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
-import { EnrichmentHandler, EnrichmentMetrics, LogFormatter, ComponentProcessor } from '../../library/index.js';
-import { FileProcessor } from '../../library/files/index.js';
+import { EnrichmentHandler, EnrichmentMetrics, FileProcessor } from '@salesforce/metadata-enrichment';
+import { ComponentProcessor, LogFormatter } from '../../utils/index.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'enrich.metadata');

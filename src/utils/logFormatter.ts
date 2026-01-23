@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { EnrichmentMetrics } from '../library/enrichment/enrichmentMetrics.js';
+import type { EnrichmentMetrics } from '@salesforce/metadata-enrichment';
 
 export class LogFormatter {
   public static logMetrics(log: (message: string) => void, metrics: EnrichmentMetrics): void {

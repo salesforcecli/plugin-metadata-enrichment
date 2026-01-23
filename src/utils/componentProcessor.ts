@@ -15,7 +15,7 @@
  */
 
 import { RegistryAccess, type SourceComponent } from '@salesforce/source-deploy-retrieve';
-import type { ComponentEnrichmentStatus, MetadataTypeAndMetadataName } from '../library/common/index.js';
+import type { ComponentEnrichmentStatus, MetadataTypeAndMetadataName } from '@salesforce/metadata-enrichment';
 
 export class ComponentProcessor {
   public static getComponentsToSkip(
