@@ -39,7 +39,7 @@ export class ComponentProcessor {
       if (requestedComponent.componentName && !existingSourceComponentNames.has(requestedComponent.componentName)) {
         missingComponents.push({
           ...requestedComponent,
-          reason: 'Not found in source project',
+          message: 'Not found in source project',
         });
       }
     }
@@ -63,7 +63,7 @@ export class ComponentProcessor {
       if (sourceComponent && sourceComponent.type?.name !== 'LightningComponentBundle') {
         filteredComponents.push({
           ...requestedComponent,
-          reason: 'Only Lightning Web Components are currently supported for enrichment',
+          message: 'Only Lightning Web Components are currently supported for enrichment',
         });
       }
 
@@ -71,7 +71,7 @@ export class ComponentProcessor {
       if (sourceComponent && sourceComponent.type?.name === 'LightningComponentBundle' && !sourceComponent.xml) {
         filteredComponents.push({
           ...requestedComponent,
-          reason: 'The component configuration file does not exist (*.js-meta.xml) for this Lightning Web Component',
+          message: 'Lightning Web Component configuration file does not exist (*.js-meta.xml)',
         });
       }
     }

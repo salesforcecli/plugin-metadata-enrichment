@@ -15,3 +15,4 @@
  */
 
 export { ComponentProcessor } from './componentProcessor.js';
+export { LogFormatter } from './logFormatter.js';

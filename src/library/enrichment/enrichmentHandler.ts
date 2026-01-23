@@ -209,10 +209,12 @@ export class EnrichmentHandler {
       if (result.status === 'fulfilled') {
         return result.value;
       }
-      // If the request was not successful, return the original record with the response set to null
+      // If the request was not successful, capture the error message
+      const errorMessage = result.reason instanceof Error ? result.reason.message : String(result.reason);
       return {
         ...records[index],
         response: null,
+        message: errorMessage,
       };
     });
   }

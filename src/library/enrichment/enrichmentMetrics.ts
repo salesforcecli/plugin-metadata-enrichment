@@ -67,7 +67,7 @@ export class EnrichmentMetrics {
       const component: ComponentEnrichmentStatus = {
         type: metadataType,
         componentName,
-        reason: record.message ?? '',
+        message: record.message ?? (record.response ? '' : 'Enrichment request failed'),
       };
 
       if (record.response) {

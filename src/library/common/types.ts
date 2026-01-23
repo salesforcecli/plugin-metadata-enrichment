@@ -20,5 +20,5 @@ export type MetadataTypeAndMetadataName = {
 };
 
 export type ComponentEnrichmentStatus = MetadataTypeAndMetadataName & {
-  reason: string;
+  message: string;
 };
