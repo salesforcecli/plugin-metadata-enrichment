@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { readFile } from 'node:fs/promises';
-import type { MetadataTypeAndMetadataName } from '../common/index.js';
+import { readFile, writeFile } from 'node:fs/promises';
+import { basename } from 'node:path';
+import { SfError } from '@salesforce/core';
+import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
+import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import type { EnrichmentRequestRecord, EnrichmentResult } from '../enrichment/enrichmentHandler.js';
 import { getMimeTypeFromExtension } from '../enrichment/enrichmentHandler.js';
 
 export type FileReadResult = {
@@ -25,47 +29,42 @@ export type FileReadResult = {
   mimeType: string;
 };
 
-/**
- * Processor for file operations
- */
 export class FileProcessor {
-  /**
-   * Reads all files from components and groups them by component name
-   */
-  public static async readAndGroupComponentFiles(
-    components: Iterable<{ fullName: string; walkContent: () => Iterable<string> }>,
-  ): Promise<Map<string, FileReadResult[]>> {
-    const fileReadPromises = Array.from(components).flatMap((component) =>
-      FileProcessor.createFileReadPromisesForComponent(component),
-    );
-    const fileResults = await Promise.all(fileReadPromises);
+  public static async updateMetadataFiles(
+    sourceComponents: SourceComponent[],
+    enrichmentRecords: EnrichmentRequestRecord[],
+  ): Promise<EnrichmentRequestRecord[]> {
+    const fileContents = await FileProcessor.readComponentXmlFilesInParallel(sourceComponents);
 
-    return FileProcessor.groupFilesByComponent(fileResults);
-  }
+    for (const file of fileContents) {
+      if (!FileProcessor.isMetaXmlFile(file.filePath)) {
+        continue;
+      }
 
-  /**
-   * Parses a metadata entry string into MetadataTypeAndMetadataName.
-   *
-   * @param entry Metadata entry string in format "TYPE:NAME"
-   * @returns Parsed metadata entry or null if invalid format
-   */
-  public static parseEntry(entry: string): MetadataTypeAndMetadataName | null {
-    const parts = entry.split(':');
-    if (parts.length >= 2) {
-      const type = parts[0].trim();
-      const componentName = parts.slice(1).join(':').trim();
-      return {
-        type,
-        componentName: componentName || undefined,
-      };
+      const enrichmentRecord = enrichmentRecords.find((record) => record.componentName === file.componentName);
+      if (!enrichmentRecord?.response) {
+        continue;
+      }
+
+      const enrichmentResult = enrichmentRecord.response.results[0];
+      if (!enrichmentResult) {
+        continue;
+      }
+
+      try {
+        const updatedXml = FileProcessor.updateMetaXml(file.fileContents, enrichmentResult);
+        // eslint-disable-next-line no-await-in-loop
+        await writeFile(file.filePath, updatedXml, 'utf-8');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        enrichmentRecord.message = errorMessage;
+      }
     }
-    return null;
+
+    return enrichmentRecords;
   }
 
-  /**
-   * Reads a single file and returns its contents with metadata
-   */
-  private static async readFileWithMetadata(componentName: string, filePath: string): Promise<FileReadResult | null> {
+  public static async readFileMetadata(componentName: string, filePath: string): Promise<FileReadResult | null> {
     try {
       const fileContents = await readFile(filePath, 'utf-8');
       const mimeType = getMimeTypeFromExtension(filePath);
@@ -77,35 +76,89 @@ export class FileProcessor {
         mimeType,
       };
     } catch {
-      // Return null for errors - they will be filtered out during grouping
       return null;
     }
   }
 
-  /**
-   * Creates file read promises for all files in a component
-   */
-  private static createFileReadPromisesForComponent(component: {
-    fullName: string;
-    walkContent: () => Iterable<string>;
-  }): Array<Promise<FileReadResult | null>> {
-    const componentName = component.fullName;
-    const filePaths = Array.from(component.walkContent());
+  public static async readComponentFiles(component: SourceComponent): Promise<FileReadResult[]> {
+    const componentName = component.fullName ?? component.name;
+    if (!componentName) {
+      return [];
+    }
 
-    return filePaths.map((filePath) => FileProcessor.readFileWithMetadata(componentName, filePath));
+    const filePaths = Array.from(component.walkContent());
+    const fileReadPromises = filePaths.map((filePath) => FileProcessor.readFileMetadata(componentName, filePath));
+
+    const fileResults = await Promise.all(fileReadPromises);
+    return fileResults.filter((result): result is FileReadResult => result !== null);
   }
 
-  /**
-   * Groups file results by component name, filtering out errors (null results)
-   */
-  private static groupFilesByComponent(fileResults: Array<FileReadResult | null>): Map<string, FileReadResult[]> {
-    const componentFilesMap = new Map<string, FileReadResult[]>();
-    for (const result of fileResults) {
-      if (result) {
-        const existing = componentFilesMap.get(result.componentName) ?? [];
-        componentFilesMap.set(result.componentName, [...existing, result]);
+  // Assumption - usages of this function are all for LWC
+  private static async readComponentXmlFilesInParallel(sourceComponents: SourceComponent[]): Promise<FileReadResult[]> {
+    const fileReadPromises: Array<Promise<FileReadResult | null>> = [];
+
+    for (const component of sourceComponents) {
+      const componentName = component.fullName ?? component.name;
+      if (!componentName || !component.xml) {
+        continue;
       }
+
+      fileReadPromises.push(FileProcessor.readFileMetadata(componentName, component.xml));
     }
-    return componentFilesMap;
+
+    const fileResults = await Promise.all(fileReadPromises);
+    return fileResults.filter((result): result is FileReadResult => result !== null);
+  }
+
+  private static isMetaXmlFile(filePath: string): boolean {
+    const fileName = basename(filePath);
+    return fileName.endsWith('.js-meta.xml');
+  }
+
+  private static updateMetaXml(xmlContent: string, result: EnrichmentResult): string {
+    const parser = new XMLParser({
+      ignoreAttributes: false,
+      preserveOrder: false,
+      trimValues: true,
+    });
+    const builder = new XMLBuilder({
+      ignoreAttributes: false,
+      format: true,
+    });
+
+    try {
+      const xmlObj = parser.parse(xmlContent) as {
+        LightningComponentBundle?: {
+          ai?: {
+            skipUplift?: string | boolean;
+            description?: string;
+            score?: string;
+          };
+        };
+      };
+
+      const ai = xmlObj.LightningComponentBundle?.ai;
+
+      // Do not update if skipUplift is set to true
+      const skipUpliftValue = ai?.skipUplift;
+      if (skipUpliftValue === true || String(skipUpliftValue).toLowerCase() === 'true') {
+        return xmlContent;
+      }
+
+      if (!xmlObj.LightningComponentBundle) {
+        xmlObj.LightningComponentBundle = {};
+      }
+
+      xmlObj.LightningComponentBundle.ai = {
+        skipUplift: 'false',
+        description: result.description,
+        score: String(result.descriptionScore),
+      };
+
+      const builtXml = builder.build(xmlObj) as string;
+      return builtXml.trim().replace(/\n{3,}/g, '\n\n');
+    } catch (error) {
+      throw new SfError(`Failed to parse XML: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 }

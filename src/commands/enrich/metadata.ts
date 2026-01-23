@@ -20,6 +20,7 @@ import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
 import type { ComponentEnrichmentStatus } from '../../library/common/index.js';
 import { EnrichmentHandler, EnrichmentMetrics } from '../../library/index.js';
 import { ComponentProcessor } from '../../library/index.js';
+import { FileProcessor } from '../../library/files/index.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'enrich.metadata');
@@ -47,7 +48,7 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     const org = flags['target-org'];
     const metadataEntries = flags['metadata'];
 
-    // Retrieve source components from the project
+    // Retrieve project source components and validate against input metadata entries
     const componentSet = await ComponentSetBuilder.build({
       metadata: {
         metadataEntries,
@@ -55,29 +56,25 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
       },
     });
     const sourceComponents = componentSet.getSourceComponents().toArray();
-
-    // Determine what is skipped based on mismatch between input and source components
-    const skippedComponents = ComponentProcessor.diffRequestedComponents(
+    const componentsToSkip = ComponentProcessor.getComponentsToSkip(
       sourceComponents,
       metadataEntries,
       project.getPath(),
     );
 
-    // TODO - Additional validation here?
-    // TODO
-    // TODO
-    // TODO
+    const componentsToProcess = sourceComponents.filter((component) => {
+      const componentName = component.fullName ?? component.name;
+      return componentName && !componentsToSkip.some((skip) => skip.componentName === componentName);
+    });
 
-    // Send enrichment requests
+    // Send enrichment requests for applicable components and update component metadata
     const connection = org.getConnection();
-    const enrichmentResults = await EnrichmentHandler.enrich(connection, sourceComponents);
+    let enrichmentResults = await EnrichmentHandler.enrich(connection, componentsToProcess);
 
-    // TODO - Do file parsing and updates here for the successful responses
-    // TODO
-    // TODO
-    // TODO
+    // Update metadata files with enrichment results
+    enrichmentResults = await FileProcessor.updateMetadataFiles(componentsToProcess, enrichmentResults);
 
-    const metrics = EnrichmentMetrics.createEnrichmentMetrics(enrichmentResults, skippedComponents);
+    const metrics = EnrichmentMetrics.createEnrichmentMetrics(enrichmentResults, componentsToSkip);
 
     // ---- DEBUG OUTPUT LOGGING ----
 

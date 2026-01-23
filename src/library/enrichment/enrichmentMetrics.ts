@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ComponentEnrichmentStatus, MetadataTypeAndMetadataName } from '../common/types.js';
+import type { ComponentEnrichmentStatus } from '../common/types.js';
 import type { EnrichmentRequestRecord } from './enrichmentHandler.js';
 
 export class EnrichmentMetrics {
@@ -50,7 +50,7 @@ export class EnrichmentMetrics {
 
   public static createEnrichmentMetrics(
     enrichmentResults: EnrichmentRequestRecord[],
-    skippedComponents: MetadataTypeAndMetadataName[] = [],
+    skippedComponents: ComponentEnrichmentStatus[] = [],
   ): EnrichmentMetrics {
     const metrics = new EnrichmentMetrics();
 
@@ -77,10 +77,7 @@ export class EnrichmentMetrics {
       }
     }
 
-    // Add skipped components to metrics
-    skippedComponents.forEach((skippedComponent) =>
-      metrics.addSkippedComponent({ ...skippedComponent, reason: 'Not found' }),
-    );
+    skippedComponents.forEach((skippedComponent) => metrics.addSkippedComponent(skippedComponent));
 
     return metrics;
   }

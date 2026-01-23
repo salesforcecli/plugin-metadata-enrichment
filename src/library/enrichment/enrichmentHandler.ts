@@ -90,36 +90,40 @@ export class EnrichmentHandler {
     return EnrichmentHandler.sendEnrichmentRequests(connection, records);
   }
 
-  public static async createEnrichmentRequestRecords(
+  private static async createEnrichmentRequestRecords(
     components: SourceComponent[],
   ): Promise<EnrichmentRequestRecord[]> {
-    const componentFilesMap = await FileProcessor.readAndGroupComponentFiles(components);
-    const records: EnrichmentRequestRecord[] = [];
-
-    for (const component of components) {
+    const recordPromises = components.map(async (component): Promise<EnrichmentRequestRecord | null> => {
       const componentName = component.fullName ?? component.name;
       if (!componentName) {
-        continue;
+        return null;
       }
 
-      const files = componentFilesMap.get(componentName);
-      if (!files) {
-        continue;
+      const files = await FileProcessor.readComponentFiles(component);
+      if (files.length === 0) {
+        return null;
       }
 
       const contentBundle = EnrichmentHandler.createContentBundle(componentName, files);
       const requestBody = EnrichmentHandler.createEnrichmentRequestBody(contentBundle);
 
-      records.push({
+      return {
         componentName,
         componentType: component.type ?? null,
         requestBody,
         response: null,
         message: null,
-      });
-    }
+      };
+    });
 
-    return records;
+    const results = await Promise.all(recordPromises);
+    const validRecords: EnrichmentRequestRecord[] = [];
+    for (const record of results) {
+      if (record !== null) {
+        validRecords.push(record);
+      }
+    }
+    return validRecords;
   }
 
   /**

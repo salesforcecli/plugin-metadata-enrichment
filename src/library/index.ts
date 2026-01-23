@@ -22,7 +22,7 @@ export {
   ENDPOINT_ENRICHMENT,
 } from './enrichment/index.js';
 export { FileProcessor } from './files/index.js';
-export { ComponentProcessor } from './component/index.js';
+export { ComponentProcessor } from '../components/index.js';
 export type { FileReadResult } from './files/index.js';
 export type { ComponentEnrichmentStatus, MetadataTypeAndMetadataName } from './common/index.js';
 export type {
