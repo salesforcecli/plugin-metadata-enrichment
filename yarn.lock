@@ -2243,14 +2243,14 @@ __metadata:
 
 "@salesforce/metadata-enrichment@file:/Users/william.xie/Documents/src/metadata-enrichment/package.tgz::locator=%40salesforce%2Fplugin-metadata-enrichment%40workspace%3A.":
   version: 1.0.0
-  resolution: "@salesforce/metadata-enrichment@file:/Users/william.xie/Documents/src/metadata-enrichment/package.tgz#/Users/william.xie/Documents/src/metadata-enrichment/package.tgz::hash=e6e06a&locator=%40salesforce%2Fplugin-metadata-enrichment%40workspace%3A."
+  resolution: "@salesforce/metadata-enrichment@file:/Users/william.xie/Documents/src/metadata-enrichment/package.tgz#/Users/william.xie/Documents/src/metadata-enrichment/package.tgz::hash=53c2c0&locator=%40salesforce%2Fplugin-metadata-enrichment%40workspace%3A."
   dependencies:
     "@salesforce/core": "npm:^6.7.0"
     "@salesforce/kit": "npm:^3.0.15"
     "@salesforce/source-deploy-retrieve": "npm:^12.0.1"
     "@salesforce/ts-types": "npm:^2.0.9"
     fast-xml-parser: "npm:^4.3.0"
-  checksum: 10c0/d4bc653bf5deb7361d412fb610bbba4daabde68438e642abda8193a97f5d405dc802699f132eff705afa01e7c7ef9e6c23dae2b32ef87b2a5eb1b2f7f8c1a4f9
+  checksum: 10c0/7df92ec27c5b66f8bdbd47b6ec7c502f5a33384fd2dce25ead31c759d235d31394f2ffc99ba2110c7284123e35a9dc7bf20b4cb9b03333ada0a920a06d224a1a
   languageName: node
   linkType: hard
 

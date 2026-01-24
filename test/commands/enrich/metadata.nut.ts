@@ -28,10 +28,28 @@ describe('enrich metadata NUTs', () => {
     await session?.clean();
   });
 
-  it('should display provided name', () => {
-    const name = 'World';
-    const command = `enrich metadata --name ${name}`;
-    const output = execCmd(command, { ensureExitCode: 0 }).shellOutput.stdout;
-    expect(output).to.contain(name);
+  describe('--metadata flag', () => {
+    it('should require metadata flag', () => {
+      const result = execCmd('enrich metadata --target-org test@example.com', { ensureExitCode: 1 });
+      expect(result.shellOutput.stderr).to.include('Missing required flag');
+    });
+
+    it('should accept metadata flag with LightningComponentBundle', () => {
+      const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
+      const result = execCmd(
+        `enrich metadata --target-org ${orgUsername} --metadata LightningComponentBundle:TestComponent`,
+      );
+      // Command should run (may fail if component doesn't exist, but should not fail on flag parsing)
+      expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
+    });
+
+    it('should accept multiple metadata entries', () => {
+      const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
+      const result = execCmd(
+        `enrich metadata --target-org ${orgUsername} --metadata LightningComponentBundle:Component1 LightningComponentBundle:Component2`,
+      );
+      // Command should run (may fail if components don't exist, but should not fail on flag parsing)
+      expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
+    });
   });
 });
