@@ -17,8 +17,9 @@
 import { Messages, SfProject } from '@salesforce/core';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
-import { EnrichmentHandler, EnrichmentMetrics, FileProcessor } from '@salesforce/metadata-enrichment';
-import { ComponentProcessor, LogFormatter } from '../../utils/index.js';
+import { EnrichmentHandler, EnrichmentMetrics, EnrichmentStatus, FileProcessor } from '@salesforce/metadata-enrichment';
+import { ComponentProcessor } from '../../component/index.js';
+import { MetricsFormatter, EnrichmentRecords } from '../../utils/index.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'enrich.metadata');
@@ -46,36 +47,51 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     const org = flags['target-org'];
     const metadataEntries = flags['metadata'];
 
-    this.spinner.start('Retrieving project source components');
-    const componentSet = await ComponentSetBuilder.build({
+    this.spinner.start('Setting up and retrieving project source components');
+    const projectComponentSet = await ComponentSetBuilder.build({
       metadata: {
         metadataEntries,
         directoryPaths: [project.getPath()],
       },
     });
-    const sourceComponents = componentSet.getSourceComponents().toArray();
+    const projectSourceComponents = projectComponentSet.getSourceComponents().toArray();
+    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents);
+
     const componentsToSkip = ComponentProcessor.getComponentsToSkip(
-      sourceComponents,
+      projectSourceComponents,
       metadataEntries,
       project.getPath(),
     );
-    const componentsToProcess = sourceComponents.filter((component) => {
+    enrichmentRecords.addSkippedComponents(componentsToSkip);
+    enrichmentRecords.updateWithStatus(componentsToSkip, EnrichmentStatus.SKIPPED);
+    enrichmentRecords.generateSkipReasons(componentsToSkip, projectSourceComponents);
+
+    const componentsEligibleToProcess = projectSourceComponents.filter((component) => {
       const componentName = component.fullName ?? component.name;
-      return componentName && !componentsToSkip.some((skip) => skip.componentName === componentName);
+      if (!componentName) return false;
+      for (const skip of componentsToSkip) {
+        if (skip.componentName === componentName) return false;
+      }
+      return true;
     });
     this.spinner.stop();
 
-    this.spinner.start('Executing metadata enrichment');
+    this.spinner.start(`Executing metadata enrichment for ${componentsEligibleToProcess.length} eligible components`);
     const connection = org.getConnection();
-    let enrichmentResults = await EnrichmentHandler.enrich(connection, componentsToProcess);
+    const enrichmentResults = await EnrichmentHandler.enrich(connection, componentsEligibleToProcess);
+    enrichmentRecords.updateWithResults(enrichmentResults);
     this.spinner.stop();
 
     this.spinner.start('Updating metadata configuration with enriched results');
-    enrichmentResults = await FileProcessor.updateMetadataFiles(componentsToProcess, enrichmentResults);
+    const fileUpdatedRecords = await FileProcessor.updateMetadataFiles(
+      componentsEligibleToProcess,
+      enrichmentRecords.recordSet,
+    );
+    enrichmentRecords.updateWithResults(Array.from(fileUpdatedRecords));
     this.spinner.stop();
 
-    const metrics = EnrichmentMetrics.createEnrichmentMetrics(enrichmentResults, componentsToSkip);
-    LogFormatter.logMetrics(this.log.bind(this), metrics);
+    const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
+    MetricsFormatter.logMetrics(this.log.bind(this), metrics);
 
     return metrics;
   }

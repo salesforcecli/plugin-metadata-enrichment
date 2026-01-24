@@ -16,7 +16,7 @@
 
 import type { EnrichmentMetrics } from '@salesforce/metadata-enrichment';
 
-export class LogFormatter {
+export class MetricsFormatter {
   public static logMetrics(log: (message: string) => void, metrics: EnrichmentMetrics): void {
     log('');
     log(`Total Components Processed: ${metrics.total}`);
@@ -38,6 +38,7 @@ export class LogFormatter {
         log(`  • ${component.type}:${component.componentName ?? '*'}`);
         if (component.message) {
           log(`    Message: ${component.message}`);
+          log('');
         }
       }
     }
@@ -50,6 +51,7 @@ export class LogFormatter {
         log(`  • ${component.type}:${component.componentName ?? '*'}`);
         if (component.message) {
           log(`    Message: ${component.message}`);
+          log('');
         }
       }
     }

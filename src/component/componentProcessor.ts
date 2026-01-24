@@ -15,68 +15,65 @@
  */
 
 import { RegistryAccess, type SourceComponent } from '@salesforce/source-deploy-retrieve';
-import type { ComponentEnrichmentStatus, MetadataTypeAndMetadataName } from '@salesforce/metadata-enrichment';
+import type { MetadataTypeAndMetadataName } from '@salesforce/metadata-enrichment';
 
 export class ComponentProcessor {
   public static getComponentsToSkip(
     sourceComponents: SourceComponent[],
     metadataEntries: string[],
     projectDir?: string,
-  ): ComponentEnrichmentStatus[] {
+  ): Set<MetadataTypeAndMetadataName> {
     const requestedComponents = ComponentProcessor.parseRequestedComponents(metadataEntries, projectDir);
     const missingComponents = ComponentProcessor.diffRequestedComponents(sourceComponents, requestedComponents);
     const filteredComponents = ComponentProcessor.filterComponents(sourceComponents, requestedComponents);
-    return [...missingComponents, ...filteredComponents];
-  }
-
-  private static diffRequestedComponents(
-    sourceComponents: SourceComponent[],
-    requestedComponents: Set<MetadataTypeAndMetadataName>,
-  ): ComponentEnrichmentStatus[] {
-    const existingSourceComponentNames = ComponentProcessor.getExistingSourceComponentNames(sourceComponents);
-    const missingComponents: ComponentEnrichmentStatus[] = [];
-    for (const requestedComponent of requestedComponents) {
-      if (requestedComponent.componentName && !existingSourceComponentNames.has(requestedComponent.componentName)) {
-        missingComponents.push({
-          ...requestedComponent,
-          message: 'Not found in source project',
-        });
-      }
-    }
-
-    return missingComponents;
+    return new Set([...missingComponents, ...filteredComponents]);
   }
 
   private static filterComponents(
     sourceComponents: SourceComponent[],
     requestedComponents: Set<MetadataTypeAndMetadataName>,
-  ): ComponentEnrichmentStatus[] {
+  ): Set<MetadataTypeAndMetadataName> {
     const sourceComponentMap = ComponentProcessor.createSourceComponentMap(sourceComponents);
-    const filteredComponents: ComponentEnrichmentStatus[] = [];
+    const filteredComponents = new Set<MetadataTypeAndMetadataName>();
 
     for (const requestedComponent of requestedComponents) {
       const sourceComponent = requestedComponent.componentName
         ? sourceComponentMap.get(requestedComponent.componentName)
         : undefined;
 
+      if (!sourceComponent) continue;
+
       // Filter out non-LWC components
-      if (sourceComponent && sourceComponent.type?.name !== 'LightningComponentBundle') {
-        filteredComponents.push({
-          ...requestedComponent,
-          message: 'Only Lightning Web Components are currently supported for enrichment',
+      if (sourceComponent.type?.name !== 'LightningComponentBundle') {
+        filteredComponents.add({
+          type: sourceComponent.type.name,
+          componentName: requestedComponent.componentName,
         });
       }
-
       // Filter out LWC components that are missing the metadata xml file
-      if (sourceComponent && sourceComponent.type?.name === 'LightningComponentBundle' && !sourceComponent.xml) {
-        filteredComponents.push({
-          ...requestedComponent,
-          message: 'Lightning Web Component configuration file does not exist (*.js-meta.xml)',
+      else if (sourceComponent.type?.name === 'LightningComponentBundle' && !sourceComponent.xml) {
+        filteredComponents.add({
+          type: sourceComponent.type.name,
+          componentName: requestedComponent.componentName,
         });
       }
     }
 
     return filteredComponents;
+  }
+
+  private static diffRequestedComponents(
+    sourceComponents: SourceComponent[],
+    requestedComponents: Set<MetadataTypeAndMetadataName>,
+  ): Set<MetadataTypeAndMetadataName> {
+    const existingSourceComponentNames = ComponentProcessor.getExistingSourceComponentNames(sourceComponents);
+    const missingComponents = new Set<MetadataTypeAndMetadataName>();
+    for (const requestedComponent of requestedComponents) {
+      if (requestedComponent.componentName && !existingSourceComponentNames.has(requestedComponent.componentName)) {
+        missingComponents.add(requestedComponent);
+      }
+    }
+    return missingComponents;
   }
 
   private static parseRequestedComponents(
@@ -92,7 +89,7 @@ export class ComponentProcessor {
       }
 
       // Ignore wildcarded component names
-      if (parsed.componentName && parsed.componentName.includes('*')) {
+      if (parsed.componentName?.includes('*')) {
         continue;
       }
 
@@ -104,14 +101,12 @@ export class ComponentProcessor {
 
   private static getExistingSourceComponentNames(sourceComponents: SourceComponent[]): Set<string> {
     const existingSourceComponentNames = new Set<string>();
-
     for (const component of sourceComponents) {
       const componentName = component.fullName ?? component.name;
       if (componentName) {
         existingSourceComponentNames.add(componentName);
       }
     }
-
     return existingSourceComponentNames;
   }
 
@@ -134,6 +129,9 @@ export class ComponentProcessor {
       // Split on the first colon, and then join the rest back together to support names that include colons
       const [typeName, ...nameParts] = rawEntry.split(':');
       const type = registry.getTypeByName(typeName.trim());
+      if (!type) {
+        return null;
+      }
       const metadataName = nameParts.length > 0 ? nameParts.join(':').trim() : '*';
       return {
         type: type.name,
