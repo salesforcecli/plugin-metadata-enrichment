@@ -17,6 +17,12 @@
 import type { EnrichmentMetrics } from '@salesforce/metadata-enrichment';
 
 export class MetricsFormatter {
+  /**
+   * Log the formatted enrichment metrics to the console
+   *
+   * @param log
+   * @param metrics
+   */
   public static logMetrics(log: (message: string) => void, metrics: EnrichmentMetrics): void {
     log('');
     log(`Total Components Processed: ${metrics.total}`);

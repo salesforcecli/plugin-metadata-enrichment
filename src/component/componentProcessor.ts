@@ -18,6 +18,19 @@ import { RegistryAccess, type SourceComponent } from '@salesforce/source-deploy-
 import type { MetadataTypeAndName } from '@salesforce/metadata-enrichment';
 
 export class ComponentProcessor {
+  /**
+   *
+   * Determine the components to SKIP based on the source components and the metadata entries.
+   * This includes:
+   * - Input components that do not exist in the source project
+   * - Non-LWC components
+   * - LWC components that are missing their metadata configuration file
+   *
+   * @param sourceComponents
+   * @param metadataEntries
+   * @param projectDir
+   * @returns
+   */
   public static getComponentsToSkip(
     sourceComponents: SourceComponent[],
     metadataEntries: string[],
