@@ -15,14 +15,14 @@
  */
 
 import { RegistryAccess, type SourceComponent } from '@salesforce/source-deploy-retrieve';
-import type { MetadataTypeAndMetadataName } from '@salesforce/metadata-enrichment';
+import type { MetadataTypeAndName } from '@salesforce/metadata-enrichment';
 
 export class ComponentProcessor {
   public static getComponentsToSkip(
     sourceComponents: SourceComponent[],
     metadataEntries: string[],
     projectDir?: string,
-  ): Set<MetadataTypeAndMetadataName> {
+  ): Set<MetadataTypeAndName> {
     const requestedComponents = ComponentProcessor.parseRequestedComponents(metadataEntries, projectDir);
     const missingComponents = ComponentProcessor.diffRequestedComponents(sourceComponents, requestedComponents);
     const filteredComponents = ComponentProcessor.filterComponents(sourceComponents, requestedComponents);
@@ -31,29 +31,28 @@ export class ComponentProcessor {
 
   private static filterComponents(
     sourceComponents: SourceComponent[],
-    requestedComponents: Set<MetadataTypeAndMetadataName>,
-  ): Set<MetadataTypeAndMetadataName> {
+    requestedComponents: Set<MetadataTypeAndName | null>,
+  ): Set<MetadataTypeAndName> {
     const sourceComponentMap = ComponentProcessor.createSourceComponentMap(sourceComponents);
-    const filteredComponents = new Set<MetadataTypeAndMetadataName>();
+    const filteredComponents = new Set<MetadataTypeAndName>();
 
     for (const requestedComponent of requestedComponents) {
-      const sourceComponent = requestedComponent.componentName
-        ? sourceComponentMap.get(requestedComponent.componentName)
-        : undefined;
+      if (!requestedComponent?.componentName) continue;
 
+      const sourceComponent = sourceComponentMap.get(requestedComponent.componentName);
       if (!sourceComponent) continue;
 
       // Filter out non-LWC components
       if (sourceComponent.type?.name !== 'LightningComponentBundle') {
         filteredComponents.add({
-          type: sourceComponent.type.name,
+          typeName: sourceComponent.type.name,
           componentName: requestedComponent.componentName,
         });
       }
       // Filter out LWC components that are missing the metadata xml file
       else if (sourceComponent.type?.name === 'LightningComponentBundle' && !sourceComponent.xml) {
         filteredComponents.add({
-          type: sourceComponent.type.name,
+          typeName: sourceComponent.type.name,
           componentName: requestedComponent.componentName,
         });
       }
@@ -64,10 +63,10 @@ export class ComponentProcessor {
 
   private static diffRequestedComponents(
     sourceComponents: SourceComponent[],
-    requestedComponents: Set<MetadataTypeAndMetadataName>,
-  ): Set<MetadataTypeAndMetadataName> {
+    requestedComponents: Set<MetadataTypeAndName>,
+  ): Set<MetadataTypeAndName> {
     const existingSourceComponentNames = ComponentProcessor.getExistingSourceComponentNames(sourceComponents);
-    const missingComponents = new Set<MetadataTypeAndMetadataName>();
+    const missingComponents = new Set<MetadataTypeAndName>();
     for (const requestedComponent of requestedComponents) {
       if (requestedComponent.componentName && !existingSourceComponentNames.has(requestedComponent.componentName)) {
         missingComponents.add(requestedComponent);
@@ -76,11 +75,8 @@ export class ComponentProcessor {
     return missingComponents;
   }
 
-  private static parseRequestedComponents(
-    metadataEntries: string[],
-    projectDir?: string,
-  ): Set<MetadataTypeAndMetadataName> {
-    const requestedComponents = new Set<MetadataTypeAndMetadataName>();
+  private static parseRequestedComponents(metadataEntries: string[], projectDir?: string): Set<MetadataTypeAndName> {
+    const requestedComponents = new Set<MetadataTypeAndName>();
 
     for (const entry of metadataEntries) {
       const parsed = ComponentProcessor.parseMetadataEntry(entry, projectDir);
@@ -123,7 +119,7 @@ export class ComponentProcessor {
     return componentMap;
   }
 
-  private static parseMetadataEntry(rawEntry: string, projectDir?: string): MetadataTypeAndMetadataName | null {
+  private static parseMetadataEntry(rawEntry: string, projectDir?: string): MetadataTypeAndName | null {
     try {
       const registry = new RegistryAccess(undefined, projectDir);
       // Split on the first colon, and then join the rest back together to support names that include colons
@@ -133,9 +129,13 @@ export class ComponentProcessor {
         return null;
       }
       const metadataName = nameParts.length > 0 ? nameParts.join(':').trim() : '*';
+      // Return null for wildcards since componentName is required
+      if (metadataName === '*') {
+        return null;
+      }
       return {
-        type: type.name,
-        componentName: metadataName === '*' ? undefined : metadataName,
+        typeName: type.name,
+        componentName: metadataName,
       };
     } catch {
       return null;

@@ -26,7 +26,7 @@ export class MetricsFormatter {
     log(`✓ Successfully Enriched: ${metrics.success.count}`);
     if (metrics.success.components.length > 0) {
       for (const component of metrics.success.components) {
-        log(`  • ${component.type}:${component.componentName ?? '*'}`);
+        log(`  • ${component.typeName}:${component.componentName ?? '*'}`);
       }
     }
     log('');
@@ -35,7 +35,7 @@ export class MetricsFormatter {
     log(`⊘ Skipped: ${metrics.skipped.count}`);
     if (metrics.skipped.components.length > 0) {
       for (const component of metrics.skipped.components) {
-        log(`  • ${component.type}:${component.componentName ?? '*'}`);
+        log(`  • ${component.typeName}:${component.componentName ?? '*'}`);
         if (component.message) {
           log(`    Message: ${component.message}`);
           log('');
@@ -48,7 +48,7 @@ export class MetricsFormatter {
     log(`✗ Failed: ${metrics.fail.count}`);
     if (metrics.fail.components.length > 0) {
       for (const component of metrics.fail.components) {
-        log(`  • ${component.type}:${component.componentName ?? '*'}`);
+        log(`  • ${component.typeName}:${component.componentName ?? '*'}`);
         if (component.message) {
           log(`    Message: ${component.message}`);
           log('');

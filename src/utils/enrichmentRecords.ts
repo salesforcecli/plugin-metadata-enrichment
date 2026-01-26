@@ -18,7 +18,7 @@ import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
 import {
   EnrichmentStatus,
   type EnrichmentRequestRecord,
-  type MetadataTypeAndMetadataName,
+  type MetadataTypeAndName,
 } from '@salesforce/metadata-enrichment';
 
 export class EnrichmentRecords {
@@ -43,7 +43,7 @@ export class EnrichmentRecords {
     }
   }
 
-  public addSkippedComponents(componentsToSkip: Set<MetadataTypeAndMetadataName>): void {
+  public addSkippedComponents(componentsToSkip: Set<MetadataTypeAndName>): void {
     for (const component of componentsToSkip) {
       if (!component.componentName) continue;
 
@@ -54,7 +54,7 @@ export class EnrichmentRecords {
       // Create a new record for the skipped component
       this.recordSet.add({
         componentName: component.componentName,
-        componentType: { name: component.type } as SourceComponent['type'],
+        componentType: { name: component.typeName } as SourceComponent['type'],
         requestBody: { contentBundles: [], metadataType: 'Generic', maxTokens: 250 },
         response: null,
         message: null,
@@ -63,8 +63,8 @@ export class EnrichmentRecords {
     }
   }
 
-  public updateWithStatus(componentsToUpdate: Set<MetadataTypeAndMetadataName>, status: EnrichmentStatus): void {
-    const componentsToUpdateMap = new Map<string, MetadataTypeAndMetadataName>();
+  public updateWithStatus(componentsToUpdate: Set<MetadataTypeAndName>, status: EnrichmentStatus): void {
+    const componentsToUpdateMap = new Map<string, MetadataTypeAndName>();
     for (const component of componentsToUpdate) {
       if (component.componentName) {
         componentsToUpdateMap.set(component.componentName, component);
@@ -95,7 +95,7 @@ export class EnrichmentRecords {
   }
 
   public generateSkipReasons(
-    componentsToSkip: Set<MetadataTypeAndMetadataName>,
+    componentsToSkip: Set<MetadataTypeAndName>,
     projectSourceComponents: SourceComponent[],
   ): void {
     const sourceComponentMap = new Map<string, SourceComponent>();

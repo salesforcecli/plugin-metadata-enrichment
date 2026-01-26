@@ -13,5 +13,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/require-await': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
   },
 };
