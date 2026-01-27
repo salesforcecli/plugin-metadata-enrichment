@@ -15,6 +15,7 @@
  */
 
 import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
+import type { Messages } from '@salesforce/core';
 import {
   EnrichmentStatus,
   type EnrichmentRequestRecord,
@@ -23,8 +24,10 @@ import {
 
 export class EnrichmentRecords {
   public readonly recordSet: Set<EnrichmentRequestRecord>;
+  private readonly errorMessages: Messages<string>;
 
-  public constructor(projectSourceComponents: SourceComponent[]) {
+  public constructor(projectSourceComponents: SourceComponent[], errorMessages: Messages<string>) {
+    this.errorMessages = errorMessages;
     this.recordSet = new Set<EnrichmentRequestRecord>();
 
     // Create initial records for all provided source components
@@ -96,7 +99,7 @@ export class EnrichmentRecords {
 
   public generateSkipReasons(
     componentsToSkip: Set<MetadataTypeAndName>,
-    projectSourceComponents: SourceComponent[],
+    projectSourceComponents: SourceComponent[]
   ): void {
     const sourceComponentMap = new Map<string, SourceComponent>();
     for (const component of projectSourceComponents) {
@@ -115,13 +118,13 @@ export class EnrichmentRecords {
       const sourceComponent = sourceComponentMap.get(skip.componentName);
       let message: string;
       if (!sourceComponent) {
-        message = 'Component not found in project';
+        message = this.errorMessages.getMessage('errors.component.not.found');
       } else if (sourceComponent?.type?.name !== 'LightningComponentBundle') {
-        message = 'Only Lightning Web Components are currently supported for enrichment';
+        message = this.errorMessages.getMessage('errors.lwc.only');
       } else if (sourceComponent?.type?.name === 'LightningComponentBundle' && !sourceComponent.xml) {
-        message = 'Lightning Web Component configuration file does not exist (*.js-meta.xml)';
+        message = this.errorMessages.getMessage('errors.lwc.configuration.not.found');
       } else {
-        message = 'Unknown';
+        message = this.errorMessages.getMessage('errors.unknown');
       }
 
       record.message = message;

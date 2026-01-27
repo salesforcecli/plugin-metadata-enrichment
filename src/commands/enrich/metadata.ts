@@ -22,12 +22,14 @@ import { ComponentProcessor } from '../../component/index.js';
 import { MetricsFormatter, EnrichmentRecords } from '../../utils/index.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'enrich.metadata');
+const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'enrich.metadata');
+const errorsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'errors');
+const metricsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metrics');
 
 export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
-  public static readonly summary = messages.getMessage('summary');
-  public static readonly description = messages.getMessage('description');
-  public static readonly examples = messages.getMessages('examples');
+  public static readonly summary = commandMessages.getMessage('summary');
+  public static readonly description = commandMessages.getMessage('description');
+  public static readonly examples = commandMessages.getMessages('examples');
 
   public static readonly flags = {
     'target-org': Flags.requiredOrg(),
@@ -35,8 +37,8 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
       multiple: true,
       delimiter: ',',
       char: 'm',
-      summary: messages.getMessage('flags.name.summary'),
-      description: messages.getMessage('flags.name.description'),
+      summary: commandMessages.getMessage('flags.metadata.summary'),
+      description: commandMessages.getMessage('flags.metadata.description'),
       required: true,
     }),
   };
@@ -55,12 +57,12 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
       },
     });
     const projectSourceComponents = projectComponentSet.getSourceComponents().toArray();
-    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents);
+    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents, errorsMessages);
 
     const componentsToSkip = ComponentProcessor.getComponentsToSkip(
       projectSourceComponents,
       metadataEntries,
-      project.getPath(),
+      project.getPath()
     );
     enrichmentRecords.addSkippedComponents(componentsToSkip);
     enrichmentRecords.updateWithStatus(componentsToSkip, EnrichmentStatus.SKIPPED);
@@ -85,13 +87,13 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     this.spinner.start('Updating metadata configuration with enriched results');
     const fileUpdatedRecords = await FileProcessor.updateMetadataFiles(
       componentsEligibleToProcess,
-      enrichmentRecords.recordSet,
+      enrichmentRecords.recordSet
     );
     enrichmentRecords.updateWithResults(Array.from(fileUpdatedRecords));
     this.spinner.stop();
 
     const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
-    MetricsFormatter.logMetrics(this.log.bind(this), metrics);
+    MetricsFormatter.logMetrics(this.log.bind(this), metrics, metricsMessages);
 
     return metrics;
   }

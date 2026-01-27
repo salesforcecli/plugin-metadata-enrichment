@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { Messages } from '@salesforce/core';
 import type { EnrichmentMetrics } from '@salesforce/metadata-enrichment';
 
 export class MetricsFormatter {
@@ -22,14 +23,19 @@ export class MetricsFormatter {
    *
    * @param log
    * @param metrics
+   * @param metricsMessages
    */
-  public static logMetrics(log: (message: string) => void, metrics: EnrichmentMetrics): void {
+  public static logMetrics(
+    log: (message: string) => void,
+    metrics: EnrichmentMetrics,
+    metricsMessages: Messages<string>
+  ): void {
     log('');
-    log(`Total Components Processed: ${metrics.total}`);
+    log(metricsMessages.getMessage('metrics.total.count', [metrics.total]));
     log('');
 
     // Success section
-    log(`✓ Successfully Enriched: ${metrics.success.count}`);
+    log(metricsMessages.getMessage('metrics.success.count', [metrics.success.count]));
     if (metrics.success.components.length > 0) {
       for (const component of metrics.success.components) {
         log(`  • ${component.typeName}:${component.componentName ?? '*'}`);
@@ -38,12 +44,12 @@ export class MetricsFormatter {
     log('');
 
     // Skipped section
-    log(`⊘ Skipped: ${metrics.skipped.count}`);
+    log(metricsMessages.getMessage('metrics.skipped.count', [metrics.skipped.count]));
     if (metrics.skipped.components.length > 0) {
       for (const component of metrics.skipped.components) {
         log(`  • ${component.typeName}:${component.componentName ?? '*'}`);
         if (component.message) {
-          log(`    Message: ${component.message}`);
+          log(`    ` + metricsMessages.getMessage(`metrics.message`, [component.message]));
           log('');
         }
       }
@@ -51,12 +57,12 @@ export class MetricsFormatter {
     log('');
 
     // Failed section
-    log(`✗ Failed: ${metrics.fail.count}`);
+    log(metricsMessages.getMessage('metrics.fail.count', [metrics.fail.count]));
     if (metrics.fail.components.length > 0) {
       for (const component of metrics.fail.components) {
         log(`  • ${component.typeName}:${component.componentName ?? '*'}`);
         if (component.message) {
-          log(`    Message: ${component.message}`);
+          log(`    ` + metricsMessages.getMessage(`metrics.message`, [component.message]));
           log('');
         }
       }
