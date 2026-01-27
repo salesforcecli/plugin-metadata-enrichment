@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/EnrichmentMetrics",
+  "definitions": {
+    "EnrichmentMetrics": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "number"
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ComponentEnrichmentStatus"
+              }
+            }
+          },
+          "required": ["count", "components"],
+          "additionalProperties": false
+        },
+        "fail": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "number"
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ComponentEnrichmentStatus"
+              }
+            }
+          },
+          "required": ["count", "components"],
+          "additionalProperties": false
+        },
+        "skipped": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "number"
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ComponentEnrichmentStatus"
+              }
+            }
+          },
+          "required": ["count", "components"],
+          "additionalProperties": false
+        },
+        "total": {
+          "type": "number"
+        }
+      },
+      "required": ["success", "fail", "skipped", "total"],
+      "additionalProperties": false
+    },
+    "ComponentEnrichmentStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "componentName": {
+          "type": "string"
+        }
+      },
+      "required": ["componentName", "message", "typeName"]
+    }
+  }
+}
