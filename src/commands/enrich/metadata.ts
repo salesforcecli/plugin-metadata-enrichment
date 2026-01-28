@@ -49,7 +49,7 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     const org = flags['target-org'];
     const metadataEntries = flags['metadata'];
 
-    this.spinner.start('Setting up and retrieving project source components');
+    this.spinner.start(commandMessages.getMessage('spinner.setup'));
     const projectComponentSet = await ComponentSetBuilder.build({
       metadata: {
         metadataEntries,
@@ -78,13 +78,13 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     });
     this.spinner.stop();
 
-    this.spinner.start(`Executing metadata enrichment for ${componentsEligibleToProcess.length} eligible components`);
+    this.spinner.start(commandMessages.getMessage('spinner.executing', [componentsEligibleToProcess.length]));
     const connection = org.getConnection();
     const enrichmentResults = await EnrichmentHandler.enrich(connection, componentsEligibleToProcess);
     enrichmentRecords.updateWithResults(enrichmentResults);
     this.spinner.stop();
 
-    this.spinner.start('Updating metadata configuration with enriched results');
+    this.spinner.start(commandMessages.getMessage('spinner.updating.files'));
     const fileUpdatedRecords = await FileProcessor.updateMetadataFiles(
       componentsEligibleToProcess,
       enrichmentRecords.recordSet

@@ -39,3 +39,15 @@ This plugin only supports enrichment for LightningComponentBundle metadata at th
 # flags.metadata.description
 
 Wildcards (_ ) supported as long as you use quotes, such as "LightningComponentBundle:MyClass_".
+
+# spinner.setup
+
+Setting up and retrieving project source components
+
+# spinner.executing
+
+Executing metadata enrichment for %s eligible components
+
+# spinner.updating.files
+
+Updating metadata configuration with enriched results
