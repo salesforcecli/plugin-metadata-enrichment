@@ -8,7 +8,7 @@
     "@oclif/core": "^4",
     "@salesforce/core": "^8.24.0",
     "@salesforce/kit": "^3.2.4",
-    "@salesforce/metadata-enrichment": "/Users/william.xie/Documents/src/metadata-enrichment/package.tgz",
+    "@salesforce/metadata-enrichment": "^1.0.0",
     "@salesforce/sf-plugins-core": "^12",
     "@salesforce/source-deploy-retrieve": "^12.0.1",
     "fast-xml-parser": "^5.3.3",
