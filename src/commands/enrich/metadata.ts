@@ -92,6 +92,10 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     enrichmentRecords.updateWithResults(Array.from(fileUpdatedRecords));
     this.spinner.stop();
 
+    for (const record of enrichmentRecords.recordSet) {
+      this.log(JSON.stringify(record.response, null, 2));
+    }
+
     const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
     MetricsFormatter.logMetrics(this.log.bind(this), metrics, metricsMessages);
 

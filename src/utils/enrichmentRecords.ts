@@ -37,7 +37,7 @@ export class EnrichmentRecords {
         this.recordSet.add({
           componentName,
           componentType: component.type,
-          requestBody: { contentBundles: [], metadataType: 'Generic', maxTokens: 250 },
+          requestBody: { contentBundles: [], metadataType: 'Generic', maxTokens: 50 },
           response: null,
           message: null,
           status: EnrichmentStatus.NOT_PROCESSED,
@@ -58,7 +58,7 @@ export class EnrichmentRecords {
       this.recordSet.add({
         componentName: component.componentName,
         componentType: { name: component.typeName } as SourceComponent['type'],
-        requestBody: { contentBundles: [], metadataType: 'Generic', maxTokens: 250 },
+        requestBody: { contentBundles: [], metadataType: 'Generic', maxTokens: 50 },
         response: null,
         message: null,
         status: EnrichmentStatus.SKIPPED,
