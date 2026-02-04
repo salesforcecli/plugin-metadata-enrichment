@@ -1,14 +1,14 @@
 {
   "name": "@salesforce/plugin-metadata-enrichment",
   "description": "A Salesforce CLI plugin to enrich metadata for Salesforce resources",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "Salesforce",
   "bugs": "https://github.com/forcedotcom/cli/issues",
   "dependencies": {
     "@oclif/core": "^4",
     "@salesforce/core": "^8.24.0",
     "@salesforce/kit": "^3.2.4",
-    "@salesforce/metadata-enrichment": "^1.0.0",
+    "@salesforce/metadata-enrichment": "^0.0.1",
     "@salesforce/sf-plugins-core": "^12",
     "@salesforce/source-deploy-retrieve": "^12.0.1",
     "fast-xml-parser": "^5.3.3",
@@ -57,7 +57,7 @@
       "@salesforce/plugin-command-reference"
     ],
     "topics": {
-      "enrich": {
+      "metadata": {
         "external": true
       }
     },

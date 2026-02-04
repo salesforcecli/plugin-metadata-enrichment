@@ -17,7 +17,7 @@
 import { execCmd, TestSession } from '@salesforce/cli-plugins-testkit';
 import { expect } from 'chai';
 
-describe('enrich metadata NUTs', () => {
+describe('metadata enrich NUTs', () => {
   let session: TestSession;
 
   before(async () => {
@@ -30,14 +30,14 @@ describe('enrich metadata NUTs', () => {
 
   describe('--metadata flag', () => {
     it('should require metadata flag', () => {
-      const result = execCmd('enrich metadata --target-org test@example.com', { ensureExitCode: 1 });
+      const result = execCmd('metadata enrich --target-org test@example.com', { ensureExitCode: 1 });
       expect(result.shellOutput.stderr).to.include('Missing required flag');
     });
 
     it('should accept metadata flag with LightningComponentBundle', () => {
       const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
       const result = execCmd(
-        `enrich metadata --target-org ${orgUsername} --metadata LightningComponentBundle:TestComponent`,
+        `metadata enrich --target-org ${orgUsername} --metadata LightningComponentBundle:TestComponent`
       );
       // Command should run (may fail if component doesn't exist, but should not fail on flag parsing)
       expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
@@ -46,7 +46,7 @@ describe('enrich metadata NUTs', () => {
     it('should accept multiple metadata entries', () => {
       const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
       const result = execCmd(
-        `enrich metadata --target-org ${orgUsername} --metadata LightningComponentBundle:Component1 LightningComponentBundle:Component2`,
+        `metadata enrich --target-org ${orgUsername} --metadata LightningComponentBundle:Component1 LightningComponentBundle:Component2`
       );
       // Command should run (may fail if components don't exist, but should not fail on flag parsing)
       expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;

@@ -22,11 +22,11 @@ import { ComponentProcessor } from '../../component/index.js';
 import { MetricsFormatter, EnrichmentRecords } from '../../utils/index.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'enrich.metadata');
+const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
 const errorsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'errors');
 const metricsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metrics');
 
-export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
+export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
   public static readonly summary = commandMessages.getMessage('summary');
   public static readonly description = commandMessages.getMessage('description');
   public static readonly examples = commandMessages.getMessages('examples');
@@ -35,7 +35,6 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
     'target-org': Flags.requiredOrg(),
     metadata: Flags.string({
       multiple: true,
-      delimiter: ',',
       char: 'm',
       summary: commandMessages.getMessage('flags.metadata.summary'),
       description: commandMessages.getMessage('flags.metadata.description'),
@@ -45,7 +44,7 @@ export default class EnrichMetadata extends SfCommand<EnrichmentMetrics> {
 
   public async run(): Promise<EnrichmentMetrics> {
     const project = await SfProject.resolve();
-    const { flags } = await this.parse(EnrichMetadata);
+    const { flags } = await this.parse(MetadataEnrich);
     const org = flags['target-org'];
     const metadataEntries = flags['metadata'];
 

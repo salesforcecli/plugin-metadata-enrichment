@@ -1,7 +1,7 @@
 [
   {
     "alias": [],
-    "command": "enrich:metadata",
+    "command": "metadata:enrich",
     "flagAliases": [],
     "flagChars": ["m", "o"],
     "flags": ["target-org", "metadata", "flags-dir", "json"],

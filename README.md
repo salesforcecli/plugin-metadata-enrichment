@@ -47,7 +47,7 @@ To use your plugin, run using the local `./bin/dev` or `./bin/dev.cmd` file.
 
 ```bash
 # Run using local run file.
-./bin/dev enrich metadata
+./bin/dev metadata enrich
 ```
 
 There should be no differences when running via the Salesforce CLI or using the local run file. However, it can be useful to link the plugin to do some additional testing or run your commands from anywhere on your machine.
@@ -63,15 +63,15 @@ sf plugins
 
 <!-- commands -->
 
-- [`sf enrich metadata`](#sf-enrich-metadata)
+- [`sf metadata enrich`](#sf-metadata-enrich)
 
-## `sf enrich metadata`
+## `sf metadata enrich`
 
 Enrich metadata
 
 ```
 USAGE
-  $ sf enrich metadata -o <value> -m <value>... [--json] [--flags-dir <value>]
+  $ sf metadata enrich -o <value> -m <value>... [--json] [--flags-dir <value>]
 
 FLAGS
   -m, --metadata=<value>...  (required) (required) Metadata type and optional component name to enrich.
@@ -100,16 +100,16 @@ DESCRIPTION
 
 EXAMPLES
   Enrich metadata for a select LightningComponentBundle in the project
-  $ sf enrich metadata --metadata LightningComponentBundle:ComponentName
+  $ sf metadata enrich --metadata LightningComponentBundle:ComponentName
 
   Enrich metadata for a select LightningComponentBundle in the project for a specified target org
-  $ sf enrich metadata --metadata LightningComponentBundle:ComponentName --target-org OrgAlias
+  $ sf metadata enrich --metadata LightningComponentBundle:ComponentName --target-org OrgAlias
 
   Enrich metadata for multiple LightningComponentBundle in the project
-  $ sf enrich metadata --metadata LightningComponentBundle:Component1 --metadata LightningComponentBundle:Component2
+  $ sf metadata enrich --metadata LightningComponentBundle:Component1 --metadata LightningComponentBundle:Component2
 
   Enrich metadata for multiple LightningComponentBundle in the project matching wildcard
-  $ sf enrich metadata --metadata LightningComponentBundle:Component*
+  $ sf metadata enrich --metadata LightningComponentBundle:Component*
 
 FLAG DESCRIPTIONS
   -m, --metadata=<value>...  (required) Metadata type and optional component name to enrich.
@@ -117,6 +117,6 @@ FLAG DESCRIPTIONS
     Wildcards (* ) supported as long as you use quotes, such as "LightningComponentBundle:MyClass*"
 ```
 
-_See code: [src/commands/enrich/metadata.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/1.1.76/src/commands/enrich/metadata.ts)_
+_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/1.1.76/src/commands/metadata/enrich.ts)_
 
 <!-- commandsstop -->
