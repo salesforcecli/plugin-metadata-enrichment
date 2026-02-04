@@ -1,15 +1,15 @@
 # errors.component.not.found
 
-Component not found in project
+Component not found in project.
 
 # errors.lwc.only
 
-Only Lightning Web Components are currently supported for enrichment
+Only Lightning Web Components are currently supported for enrichment.
 
 # errors.lwc.configuration.not.found
 
-Lightning Web Component configuration file does not exist (\*.js-meta.xml)
+The Lightning Web Component configuration file doesn't exist (\*.js-meta.xml).
 
 # errors.unknown
 
-An unknown error occurred
+An unknown error occurred.
