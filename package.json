@@ -148,9 +148,6 @@
     },
     "test:only": {
       "command": "nyc mocha \"test/**/*.test.ts\"",
-      "dependencies": [
-        "compile"
-      ],
       "env": {
         "FORCE_COLOR": "2"
       },
@@ -204,6 +201,5 @@
     }
   },
   "exports": "./lib/index.js",
-  "type": "module",
-  "packageManager": "yarn@4.12.0"
+  "type": "module"
 }
