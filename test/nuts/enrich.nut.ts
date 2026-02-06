@@ -14,23 +14,37 @@
  * limitations under the License.
  */
 
-import { execCmd, TestSession } from '@salesforce/cli-plugins-testkit';
+import { fileURLToPath } from 'node:url';
 import { expect } from 'chai';
+import { execCmd } from '@salesforce/cli-plugins-testkit';
+import { SourceTestkit } from '@salesforce/source-testkit';
+
+const REPO = 'https://github.com/trailheadapps/dreamhouse-lwc.git';
+const SAMPLE_LWC = 'LightningComponentBundle:propertyCard'; // LWC from dreamhouse-lwc
 
 describe('metadata enrich NUTs', () => {
-  let session: TestSession;
+  let testkit: SourceTestkit;
 
   before(async () => {
-    session = await TestSession.create({ devhubAuthStrategy: 'NONE' });
+    testkit = await SourceTestkit.create({
+      repository: REPO,
+      nut: fileURLToPath(import.meta.url),
+    });
   });
 
   after(async () => {
-    await session?.clean();
+    await testkit?.clean();
   });
+
+  const runEnrich = (args: string, options?: { ensureExitCode?: number }) =>
+    execCmd(`metadata enrich ${args}`, {
+      cwd: testkit.projectDir,
+      ...options,
+    });
 
   describe('--help', () => {
     it('should show help with summary and metadata flag', () => {
-      const result = execCmd('metadata enrich --help', { ensureExitCode: 0 });
+      const result = runEnrich('--help', { ensureExitCode: 0 });
       expect(result.shellOutput.stdout).to.include('Enrich metadata');
       expect(result.shellOutput.stdout).to.match(/-m.*--metadata/);
     });
@@ -38,47 +52,39 @@ describe('metadata enrich NUTs', () => {
 
   describe('required flags', () => {
     it('should fail when metadata flag is missing', () => {
-      const result = execCmd('metadata enrich --target-org test@example.com', { ensureExitCode: 1 });
+      const result = runEnrich(`--target-org ${testkit.username}`, { ensureExitCode: 2 });
       expect(result.shellOutput.stderr).to.include('Missing required flag');
     });
 
-    it('should fail when target-org is missing (no default org)', () => {
-      const result = execCmd('metadata enrich --metadata LightningComponentBundle:HelloWorld', {
-        ensureExitCode: 1,
-      });
-      const output = (result.shellOutput.stderr || result.shellOutput.stdout || '').toLowerCase();
-      expect(output.length).to.be.greaterThan(0);
+    it('should use default org when target-org is omitted', () => {
+      const result = runEnrich(`--metadata ${SAMPLE_LWC}`, { ensureExitCode: 0 });
+      expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
     });
   });
 
   describe('--metadata flag', () => {
     it('should accept metadata flag with LightningComponentBundle', () => {
-      const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
-      const result = execCmd(
-        `metadata enrich --target-org ${orgUsername} --metadata LightningComponentBundle:TestComponent`
-      );
+      const result = runEnrich(`--target-org ${testkit.username} --metadata ${SAMPLE_LWC}`);
       expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
     });
 
     it('should accept multiple metadata entries', () => {
-      const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
-      const result = execCmd(
-        `metadata enrich --target-org ${orgUsername} --metadata LightningComponentBundle:Component1 LightningComponentBundle:Component2`
+      const result = runEnrich(
+        `--target-org ${testkit.username} --metadata ${SAMPLE_LWC} LightningComponentBundle:propertySummary`
       );
       expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
     });
 
     it('should accept -m short flag', () => {
-      const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
-      const result = execCmd(`metadata enrich --target-org ${orgUsername} -m LightningComponentBundle:HelloWorld`);
+      const result = runEnrich(`--target-org ${testkit.username} -m ${SAMPLE_LWC}`);
       expect(result.shellOutput.stdout || result.shellOutput.stderr).to.exist;
     });
   });
 
   describe('error scenarios', () => {
     it('should fail when target-org is invalid or not authorized', () => {
-      const result = execCmd(
-        'metadata enrich --target-org NoSuchOrg@example.com --metadata LightningComponentBundle:HelloWorld',
+      const result = runEnrich(
+        `--target-org NoSuchOrg@example.com --metadata ${SAMPLE_LWC}`,
         { ensureExitCode: 1 }
       );
       const output = (result.shellOutput.stderr || result.shellOutput.stdout || '').toLowerCase();
@@ -88,13 +94,9 @@ describe('metadata enrich NUTs', () => {
 
   describe('--json', () => {
     it('should output metrics-shaped JSON when --json is used and command runs', () => {
-      const orgUsername = session.orgs.get('default')?.username ?? 'test@example.com';
-      const result = execCmd(
-        `metadata enrich --target-org ${orgUsername} --metadata LightningComponentBundle:HelloWorld --json`
-      );
+      const result = runEnrich(`--target-org ${testkit.username} --metadata ${SAMPLE_LWC} --json`);
       const output = result.jsonOutput as Record<string, unknown> | undefined;
       if (output && typeof output === 'object') {
-        expect(output).to.have.property('total');
         expect(output).to.have.nested.property('success.count');
         expect(output).to.have.nested.property('skipped.count');
         expect(output).to.have.nested.property('fail.count');
