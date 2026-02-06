@@ -96,10 +96,12 @@ describe('metadata enrich NUTs', () => {
     it('should output metrics-shaped JSON when --json is used and command runs', () => {
       const result = runEnrich(`--target-org ${testkit.username} --metadata ${SAMPLE_LWC} --json`);
       const output = result.jsonOutput as Record<string, unknown> | undefined;
-      if (output && typeof output === 'object') {
-        expect(output).to.have.nested.property('success.count');
-        expect(output).to.have.nested.property('skipped.count');
-        expect(output).to.have.nested.property('fail.count');
+      const metrics = output?.result as Record<string, unknown> | undefined;
+      if (metrics && typeof metrics === 'object') {
+        expect(metrics).to.have.nested.property('success.count');
+        expect(metrics).to.have.nested.property('skipped.count');
+        expect(metrics).to.have.nested.property('fail.count');
+        expect(metrics).to.have.property('total');
       }
     });
   });
