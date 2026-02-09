@@ -14,6 +14,8 @@ Even though this command updates only local files in your DX project, you're sti
 
 Currently, this command supports enriching only Lightning Web Components, represented by the LightningComponentBundle metadata type.
 
+Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
+
 # examples
 
 - Enrich the "HelloWorld" LightningComponentBundle metadata component in the local DX project; use your default org:
@@ -40,14 +42,14 @@ Metadata type and optional component name to enrich.
 
 Wildcards ("_") are supported as long as you use double quotes, such as "LightningComponentBundle:MyClass_".
 
-# spinner.setup
+# stage.setup
 
 Setting up and retrieving project source components
 
-# spinner.executing
+# stage.executing
 
-Executing metadata enrichment for %s eligible components
+Executing metadata enrichment
 
-# spinner.updating.files
+# stage.updating.files
 
 Updating metadata configuration with enriched results

@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-export { MetricsFormatter } from './metricsFormatter.js';
 export { EnrichmentRecords } from './enrichmentRecords.js';

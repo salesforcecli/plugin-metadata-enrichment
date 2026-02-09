@@ -67,54 +67,64 @@ sf plugins
 
 ## `sf metadata enrich`
 
-Enrich metadata
+Enrich metadata components in your DX project by adding AI-generated descriptions.
 
 ```
 USAGE
   $ sf metadata enrich -o <value> -m <value>... [--json] [--flags-dir <value>]
 
 FLAGS
-  -m, --metadata=<value>...  (required) (required) Metadata type and optional component name to enrich.
-  -o, --target-org=<value>   (required) Username or alias of the target org. Not required if the `target-org`
-                             configuration variable is already set.
+  -m, --metadata=<value>...  (required) Metadata type and optional component name to enrich.
+  -o, --target-org=<value>   (required) [default: epic.out.18fed7c5294a@orgfarm.salesforce.com] Username or alias of the target
+                             org. Not required if the `target-org` configuration variable is already set.
 
 GLOBAL FLAGS
   --flags-dir=<value>  Import flag values from a directory.
   --json               Format output as json.
 
 DESCRIPTION
-  Enrich metadata for a Salesforce component.
+  Enrich metadata components in your DX project by adding AI-generated descriptions.
 
-  You must run this command from within a project.
+  Use this command to add AI-generated descriptions right in the metadata source files in your local DX project. These enriched
+  descriptions succinctly outline the metadata component’s purpose and capabilities, which in turn provide context when vibe
+  coding with an AI tool, such as Agentforce Vibes.
 
-  Generate and store descriptions in metadata that provide additional context to the component’s functionality and
-  purpose.
+  This command updates only the local metadata source files in your DX project; it doesn't change the components in your org. If
+  you want the AI-generated descriptions in your org, then you must explicitly deploy the updated metadata components to your org
+  by using, for example, the "project deploy start" CLI command.
 
-  To deploy multiple metadata components, either set multiple --metadata flags or a single --metadata flag with multiple
-  names separated by spaces. Enclose names that contain spaces in one set of double quotes. The same syntax applies to
-  --source-dir.
+  To enrich multiple metadata components, specify multiple --metadata <name> flags. Enclose names that contain spaces in double
+  quotes.
 
-  This is not saved in the org until you deploy the project.
+  Even though this command updates only local files in your DX project, you're still required to authorize and specify an org,
+  which is how the command accesses a large language model (LLM).
 
-  This plugin only supports enrichment for LightningComponentBundle metadata at the moment.
+  Currently, this command supports enriching only Lightning Web Components, represented by the LightningComponentBundle metadata
+  type.
+
+  Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
 
 EXAMPLES
-  Enrich metadata for a select LightningComponentBundle in the project
-  $ sf metadata enrich --metadata LightningComponentBundle:ComponentName
+  Enrich the "HelloWorld" LightningComponentBundle metadata component in the local DX project; use your default org:
 
-  Enrich metadata for a select LightningComponentBundle in the project for a specified target org
-  $ sf metadata enrich --metadata LightningComponentBundle:ComponentName --target-org OrgAlias
+    $ sf metadata enrich --metadata LightningComponentBundle:HelloWorld
 
-  Enrich metadata for multiple LightningComponentBundle in the project
-  $ sf metadata enrich --metadata LightningComponentBundle:Component1 --metadata LightningComponentBundle:Component2
+  Enrich the "HelloWorld" LightningComponentBundle metadata component and use the org with alias "my-org":
 
-  Enrich metadata for multiple LightningComponentBundle in the project matching wildcard
-  $ sf metadata enrich --metadata LightningComponentBundle:Component*
+    $ sf metadata enrich --metadata LightningComponentBundle:HelloWorld --target-org my-org
+
+  Enrich metadata for multiple LightningComponentBundles using your default org:
+
+    $ sf metadata enrich --metadata LightningComponentBundle:Component1 --metadata LightningComponentBundle:Component2
+
+  Enrich metadata for multiple LightningComponentBundles using a matching wildcard:
+
+    $ sf metadata enrich --metadata "LightningComponentBundle:Component\*"
 
 FLAG DESCRIPTIONS
-  -m, --metadata=<value>...  (required) Metadata type and optional component name to enrich.
+  -m, --metadata=<value>...  Metadata type and optional component name to enrich.
 
-    Wildcards (* ) supported as long as you use quotes, such as "LightningComponentBundle:MyClass*"
+    Wildcards ("_") are supported as long as you use double quotes, such as "LightningComponentBundle:MyClass_".
 ```
 
 _See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/1.1.76/src/commands/metadata/enrich.ts)_

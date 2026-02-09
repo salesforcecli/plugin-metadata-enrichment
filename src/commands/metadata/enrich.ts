@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+import { MultiStageOutput } from '@oclif/multi-stage-output';
 import { Messages, SfProject } from '@salesforce/core';
-import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
+import { Flags, SfCommand, Ux } from '@salesforce/sf-plugins-core';
 import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
 import { EnrichmentHandler, EnrichmentMetrics, EnrichmentStatus, FileProcessor } from '@salesforce/metadata-enrichment';
 import { ComponentProcessor } from '../../component/index.js';
-import { MetricsFormatter, EnrichmentRecords } from '../../utils/index.js';
+import { EnrichmentRecords } from '../../utils/index.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
@@ -30,6 +31,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
   public static readonly summary = commandMessages.getMessage('summary');
   public static readonly description = commandMessages.getMessage('description');
   public static readonly examples = commandMessages.getMessages('examples');
+  public static readonly state = 'preview';
 
   public static readonly flags = {
     'target-org': Flags.requiredOrg(),
@@ -48,7 +50,18 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
     const org = flags['target-org'];
     const metadataEntries = flags['metadata'];
 
-    this.spinner.start(commandMessages.getMessage('spinner.setup'));
+    const stages = [
+      commandMessages.getMessage('stage.setup'),
+      commandMessages.getMessage('stage.executing'), 
+      commandMessages.getMessage('stage.updating.files'),
+    ];
+    const mso = new MultiStageOutput({
+      stages,
+      title: commandMessages.getMessage('summary'),
+      jsonEnabled: this.jsonEnabled(),
+    });
+    mso.goto(stages[0]);
+
     const projectComponentSet = await ComponentSetBuilder.build({
       metadata: {
         metadataEntries,
@@ -75,24 +88,58 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
       }
       return true;
     });
-    this.spinner.stop();
+    mso.next();
 
-    this.spinner.start(commandMessages.getMessage('spinner.executing', [componentsEligibleToProcess.length]));
     const connection = org.getConnection();
     const enrichmentResults = await EnrichmentHandler.enrich(connection, componentsEligibleToProcess);
     enrichmentRecords.updateWithResults(enrichmentResults);
-    this.spinner.stop();
+    mso.next();
 
-    this.spinner.start(commandMessages.getMessage('spinner.updating.files'));
     const fileUpdatedRecords = await FileProcessor.updateMetadataFiles(
       componentsEligibleToProcess,
       enrichmentRecords.recordSet
     );
     enrichmentRecords.updateWithResults(Array.from(fileUpdatedRecords));
-    this.spinner.stop();
+    mso.stop();
 
     const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
-    MetricsFormatter.logMetrics(this.log.bind(this), metrics, metricsMessages);
+    const ux = new Ux();
+    ux.log('');
+    ux.log(metricsMessages.getMessage('metrics.total.count', [metrics.total]));
+    const tableRows = [
+      ...metrics.success.components.map((c) => ({
+        status: 'Success',
+        type: c.typeName,
+        component: c.componentName,
+        message: c.message,
+      })),
+      ...metrics.skipped.components.map((c) => ({
+        status: 'Skipped',
+        type: c.typeName,
+        component: c.componentName,
+        message: c.message,
+      })),
+      ...metrics.fail.components.map((c) => ({
+        status: 'Failed',
+        type: c.typeName,
+        component: c.componentName,
+        message: c.message,
+      })),
+    ];
+    if (tableRows.length > 0) {
+      ux.log('');
+      ux.table({
+        columns: [
+          { key: 'status', name: 'Status' },
+          { key: 'type', name: 'Type' },
+          { key: 'component', name: 'Component' },
+          { key: 'message', name: 'Message' },
+        ],
+        data: tableRows,
+        overflow: 'wrap',
+      });
+    }
+    ux.log('');
 
     return metrics;
   }
