@@ -75,7 +75,7 @@ USAGE
 
 FLAGS
   -m, --metadata=<value>...  (required) Metadata type and optional component name to enrich.
-  -o, --target-org=<value>   (required) [default: epic.out.18fed7c5294a@orgfarm.salesforce.com] Username or alias of the target
+  -o, --target-org=<value>   (required) Username or alias of the target
                              org. Not required if the `target-org` configuration variable is already set.
 
 GLOBAL FLAGS

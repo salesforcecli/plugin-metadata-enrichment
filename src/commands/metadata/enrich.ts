@@ -50,17 +50,18 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
     const org = flags['target-org'];
     const metadataEntries = flags['metadata'];
 
-    const stages = [
+    const STAGES_MSO = [
       commandMessages.getMessage('stage.setup'),
       commandMessages.getMessage('stage.executing'), 
       commandMessages.getMessage('stage.updating.files'),
     ];
+
     const mso = new MultiStageOutput({
-      stages,
+      stages: STAGES_MSO,
       title: commandMessages.getMessage('summary'),
       jsonEnabled: this.jsonEnabled(),
     });
-    mso.goto(stages[0]);
+    mso.goto(STAGES_MSO[0]);
 
     const projectComponentSet = await ComponentSetBuilder.build({
       metadata: {
@@ -88,11 +89,13 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
       }
       return true;
     });
+
     mso.next();
 
     const connection = org.getConnection();
     const enrichmentResults = await EnrichmentHandler.enrich(connection, componentsEligibleToProcess);
     enrichmentRecords.updateWithResults(enrichmentResults);
+
     mso.next();
 
     const fileUpdatedRecords = await FileProcessor.updateMetadataFiles(
@@ -100,6 +103,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
       enrichmentRecords.recordSet
     );
     enrichmentRecords.updateWithResults(Array.from(fileUpdatedRecords));
+    
     mso.stop();
 
     const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
