@@ -75,8 +75,8 @@ USAGE
 
 FLAGS
   -m, --metadata=<value>...  (required) Metadata type and optional component name to enrich.
-  -o, --target-org=<value>   (required) Username or alias of the target
-                             org. Not required if the `target-org` configuration variable is already set.
+  -o, --target-org=<value>   (required) Username or alias of the target org. Not required if the `target-org`
+                             configuration variable is already set.
 
 GLOBAL FLAGS
   --flags-dir=<value>  Import flag values from a directory.
@@ -85,22 +85,22 @@ GLOBAL FLAGS
 DESCRIPTION
   Enrich metadata components in your DX project by adding AI-generated descriptions.
 
-  Use this command to add AI-generated descriptions right in the metadata source files in your local DX project. These enriched
-  descriptions succinctly outline the metadata component’s purpose and capabilities, which in turn provide context when vibe
-  coding with an AI tool, such as Agentforce Vibes.
+  Use this command to add AI-generated descriptions right in the metadata source files in your local DX project. These
+  enriched descriptions succinctly outline the metadata component’s purpose and capabilities, which in turn provide
+  context when vibe coding with an AI tool, such as Agentforce Vibes.
 
-  This command updates only the local metadata source files in your DX project; it doesn't change the components in your org. If
-  you want the AI-generated descriptions in your org, then you must explicitly deploy the updated metadata components to your org
-  by using, for example, the "project deploy start" CLI command.
+  This command updates only the local metadata source files in your DX project; it doesn't change the components in your
+  org. If you want the AI-generated descriptions in your org, then you must explicitly deploy the updated metadata
+  components to your org by using, for example, the "project deploy start" CLI command.
 
-  To enrich multiple metadata components, specify multiple --metadata <name> flags. Enclose names that contain spaces in double
-  quotes.
+  To enrich multiple metadata components, specify multiple --metadata <name> flags. Enclose names that contain spaces in
+  double quotes.
 
-  Even though this command updates only local files in your DX project, you're still required to authorize and specify an org,
-  which is how the command accesses a large language model (LLM).
+  Even though this command updates only local files in your DX project, you're still required to authorize and specify
+  an org, which is how the command accesses a large language model (LLM).
 
-  Currently, this command supports enriching only Lightning Web Components, represented by the LightningComponentBundle metadata
-  type.
+  Currently, this command supports enriching only Lightning Web Components, represented by the LightningComponentBundle
+  metadata type.
 
   Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
 
@@ -115,7 +115,8 @@ EXAMPLES
 
   Enrich metadata for multiple LightningComponentBundles using your default org:
 
-    $ sf metadata enrich --metadata LightningComponentBundle:Component1 --metadata LightningComponentBundle:Component2
+    $ sf metadata enrich --metadata LightningComponentBundle:Component1 --metadata \
+      LightningComponentBundle:Component2
 
   Enrich metadata for multiple LightningComponentBundles using a matching wildcard:
 
@@ -127,6 +128,6 @@ FLAG DESCRIPTIONS
     Wildcards ("_") are supported as long as you use double quotes, such as "LightningComponentBundle:MyClass_".
 ```
 
-_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/1.1.76/src/commands/metadata/enrich.ts)_
+_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/0.0.2/src/commands/metadata/enrich.ts)_
 
 <!-- commandsstop -->
