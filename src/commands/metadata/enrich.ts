@@ -22,7 +22,6 @@ import { ComponentProcessor, EnrichmentHandler, EnrichmentMetrics, EnrichmentRec
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
-const errorsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'errors');
 const metricsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metrics');
 
 export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
@@ -68,7 +67,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
       },
     });
     const projectSourceComponents = projectComponentSet.getSourceComponents().toArray();
-    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents, errorsMessages);
+    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents);
 
     const componentsToSkip = ComponentProcessor.getComponentsToSkip(
       projectSourceComponents,
