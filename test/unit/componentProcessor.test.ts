@@ -16,7 +16,7 @@
 
 import { expect } from 'chai';
 import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
-import { ComponentProcessor } from '../../src/component/componentProcessor.js';
+import { ComponentProcessor } from '@salesforce/metadata-enrichment';
 
 function createSourceComponent(name: string, typeName: string, options?: { xml?: string }): SourceComponent {
   return {

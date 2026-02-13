@@ -15,10 +15,9 @@
  */
 
 import { expect } from 'chai';
-import { EnrichmentStatus } from '@salesforce/metadata-enrichment';
+import { EnrichmentRecords, EnrichmentStatus } from '@salesforce/metadata-enrichment';
 import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
 import type { Messages } from '@salesforce/core';
-import { EnrichmentRecords } from '../../src/utils/enrichmentRecords.js';
 
 function createSourceComponent(name: string, typeName: string): SourceComponent {
   return {
@@ -48,10 +47,27 @@ describe('EnrichmentRecords', () => {
       const arr = Array.from(records.recordSet);
       expect(arr.every((r) => r.status === EnrichmentStatus.NOT_PROCESSED)).to.be.true;
       expect(arr.map((r) => r.componentName).sort()).to.deep.equal(['Cmp1', 'Cmp2']);
+      expect(arr.every((r) => r.requestBody?.contentBundles?.length === 0)).to.be.true;
+    });
+
+    it('should set placeholder requestBody for each component (library sets real metadataType for processed components)', () => {
+      const source = [createSourceComponent('MyLwc', 'LightningComponentBundle')];
+      const records = new EnrichmentRecords(source, errorMessages);
+      const record = Array.from(records.recordSet)[0];
+      expect(record.requestBody).to.not.be.null;
+      expect(record.requestBody!.contentBundles).to.deep.equal([]);
+      expect(record.requestBody!.metadataType).to.equal('Generic');
+      expect(record.requestBody!.maxTokens).to.equal(50);
     });
 
     it('should not create record when component has no name', () => {
       const source = [{ fullName: undefined, name: undefined, type: { name: 'LWC' } }] as unknown as SourceComponent[];
+      const records = new EnrichmentRecords(source, errorMessages);
+      expect(records.recordSet.size).to.equal(0);
+    });
+
+    it('should not create record when component has no type', () => {
+      const source = [{ fullName: 'NoType', name: 'NoType', type: undefined }] as unknown as SourceComponent[];
       const records = new EnrichmentRecords(source, errorMessages);
       expect(records.recordSet.size).to.equal(0);
     });
@@ -65,6 +81,10 @@ describe('EnrichmentRecords', () => {
       const record = Array.from(records.recordSet)[0];
       expect(record.componentName).to.equal('SkippedCmp');
       expect(record.status).to.equal(EnrichmentStatus.SKIPPED);
+      expect(record.requestBody).to.not.be.null;
+      expect(record.requestBody!.contentBundles).to.deep.equal([]);
+      expect(record.requestBody!.metadataType).to.equal('Generic');
+      expect(record.requestBody!.maxTokens).to.equal(50);
     });
 
     it('should not duplicate when record already exists', () => {
@@ -89,6 +109,31 @@ describe('EnrichmentRecords', () => {
   });
 
   describe('updateWithResults', () => {
+    it('should replace record requestBody with result requestBody (library-supplied metadataType/maxTokens)', () => {
+      const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
+      const records = new EnrichmentRecords(source, errorMessages);
+      const libraryRequestBody = {
+        contentBundles: [{ resourceName: 'Cmp1', files: {} }],
+        metadataType: 'Lwc' as const,
+        maxTokens: 50,
+      };
+      records.updateWithResults([
+        {
+          componentName: 'Cmp1',
+          componentType: { name: 'LightningComponentBundle' } as SourceComponent['type'],
+          requestBody: libraryRequestBody,
+          response: { metadata: { durationMs: 0, failureCount: 0, successCount: 1, timestamp: '' }, results: [] },
+          message: null,
+          status: EnrichmentStatus.SUCCESS,
+        },
+      ]);
+      const record = Array.from(records.recordSet)[0];
+      expect(record.requestBody).to.equal(libraryRequestBody);
+      expect(record.requestBody).to.not.be.null;
+      expect(record.requestBody!.metadataType).to.equal('Lwc');
+      expect(record.requestBody!.maxTokens).to.equal(50);
+    });
+
     it('should update record to SUCCESS when response is present', () => {
       const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
       const records = new EnrichmentRecords(source, errorMessages);
