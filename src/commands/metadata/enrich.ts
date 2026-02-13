@@ -18,13 +18,10 @@ import { MultiStageOutput } from '@oclif/multi-stage-output';
 import { Messages, SfProject } from '@salesforce/core';
 import { Flags, SfCommand, Ux } from '@salesforce/sf-plugins-core';
 import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
-import { EnrichmentHandler, EnrichmentMetrics, EnrichmentStatus, FileProcessor } from '@salesforce/metadata-enrichment';
-import { ComponentProcessor } from '../../component/index.js';
-import { EnrichmentRecords } from '../../utils/index.js';
+import { ComponentProcessor, EnrichmentHandler, EnrichmentMetrics, EnrichmentRecords, EnrichmentStatus, FileProcessor } from '@salesforce/metadata-enrichment';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
-const errorsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'errors');
 const metricsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metrics');
 
 export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
@@ -70,7 +67,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
       },
     });
     const projectSourceComponents = projectComponentSet.getSourceComponents().toArray();
-    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents, errorsMessages);
+    const enrichmentRecords = new EnrichmentRecords(projectSourceComponents);
 
     const componentsToSkip = ComponentProcessor.getComponentsToSkip(
       projectSourceComponents,
@@ -103,7 +100,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
       enrichmentRecords.recordSet
     );
     enrichmentRecords.updateWithResults(Array.from(fileUpdatedRecords));
-    
+
     mso.stop();
 
     const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
