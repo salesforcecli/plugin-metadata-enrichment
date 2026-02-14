@@ -1739,10 +1739,10 @@
   dependencies:
     "@salesforce/ts-types" "^2.0.12"
 
-"@salesforce/metadata-enrichment@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@salesforce/metadata-enrichment/-/metadata-enrichment-0.0.1.tgz#e685e3bb9676dc1141b23880a10ccc098a88ecdb"
-  integrity sha512-8w3PKpgmXi6u0uKZCfuQ7f7YceivYml/92GSB5fHKSrIHFppBx2tVKgJPlauEnvyNj685HSxs7HPSMZ2bZWdJQ==
+"@salesforce/metadata-enrichment@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@salesforce/metadata-enrichment/-/metadata-enrichment-0.0.3.tgz#6f21939e47ee1c4ede3b6da439c532f96b8de525"
+  integrity sha512-/gCinn+1qDEUhfzVRam2ilfMQqKicqIZ10zKlbTgfXh6j9B87fUMWa901+85FIIN8ECx+X1ULyoWbrsM+swaSg==
   dependencies:
     "@salesforce/core" "^8.24.0"
     "@salesforce/kit" "^3.2.4"
