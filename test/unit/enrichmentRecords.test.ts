@@ -17,7 +17,6 @@
 import { expect } from 'chai';
 import { EnrichmentRecords, EnrichmentStatus } from '@salesforce/metadata-enrichment';
 import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
-import type { Messages } from '@salesforce/core';
 
 function createSourceComponent(name: string, typeName: string): SourceComponent {
   return {
@@ -27,22 +26,14 @@ function createSourceComponent(name: string, typeName: string): SourceComponent 
   } as SourceComponent;
 }
 
-function createMockMessages(): Messages<string> {
-  return {
-    getMessage: (key: string, args?: string[]) => (args?.length ? `${key}[${args.join(',')}]` : key),
-  } as Messages<string>;
-}
-
 describe('EnrichmentRecords', () => {
-  const errorMessages = createMockMessages();
-
   describe('constructor', () => {
     it('should create NOT_PROCESSED records for each source component with type and name', () => {
       const source = [
         createSourceComponent('Cmp1', 'LightningComponentBundle'),
         createSourceComponent('Cmp2', 'LightningComponentBundle'),
       ];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       expect(records.recordSet.size).to.equal(2);
       const arr = Array.from(records.recordSet);
       expect(arr.every((r) => r.status === EnrichmentStatus.NOT_PROCESSED)).to.be.true;
@@ -52,7 +43,7 @@ describe('EnrichmentRecords', () => {
 
     it('should set placeholder requestBody for each component (library sets real metadataType for processed components)', () => {
       const source = [createSourceComponent('MyLwc', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       const record = Array.from(records.recordSet)[0];
       expect(record.requestBody).to.not.be.null;
       expect(record.requestBody!.contentBundles).to.deep.equal([]);
@@ -62,20 +53,20 @@ describe('EnrichmentRecords', () => {
 
     it('should not create record when component has no name', () => {
       const source = [{ fullName: undefined, name: undefined, type: { name: 'LWC' } }] as unknown as SourceComponent[];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       expect(records.recordSet.size).to.equal(0);
     });
 
     it('should not create record when component has no type', () => {
       const source = [{ fullName: 'NoType', name: 'NoType', type: undefined }] as unknown as SourceComponent[];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       expect(records.recordSet.size).to.equal(0);
     });
   });
 
   describe('addSkippedComponents', () => {
     it('should add SKIPPED record for component not in recordSet', () => {
-      const records = new EnrichmentRecords([], errorMessages);
+      const records = new EnrichmentRecords([]);
       records.addSkippedComponents(new Set([{ typeName: 'LightningComponentBundle', componentName: 'SkippedCmp' }]));
       expect(records.recordSet.size).to.equal(1);
       const record = Array.from(records.recordSet)[0];
@@ -89,7 +80,7 @@ describe('EnrichmentRecords', () => {
 
     it('should not duplicate when record already exists', () => {
       const source = [createSourceComponent('Existing', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.addSkippedComponents(new Set([{ typeName: 'LightningComponentBundle', componentName: 'Existing' }]));
       expect(records.recordSet.size).to.equal(1);
     });
@@ -98,7 +89,7 @@ describe('EnrichmentRecords', () => {
   describe('updateWithStatus', () => {
     it('should set status for matching records', () => {
       const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.updateWithStatus(
         new Set([{ typeName: 'LightningComponentBundle', componentName: 'Cmp1' }]),
         EnrichmentStatus.SKIPPED
@@ -111,7 +102,7 @@ describe('EnrichmentRecords', () => {
   describe('updateWithResults', () => {
     it('should replace record requestBody with result requestBody (library-supplied metadataType/maxTokens)', () => {
       const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       const libraryRequestBody = {
         contentBundles: [{ resourceName: 'Cmp1', files: {} }],
         metadataType: 'Lwc' as const,
@@ -136,7 +127,7 @@ describe('EnrichmentRecords', () => {
 
     it('should update record to SUCCESS when response is present', () => {
       const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.updateWithResults([
         {
           componentName: 'Cmp1',
@@ -157,7 +148,7 @@ describe('EnrichmentRecords', () => {
 
     it('should update record to FAIL when response is null', () => {
       const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.updateWithResults([
         {
           componentName: 'Cmp1',
@@ -175,7 +166,7 @@ describe('EnrichmentRecords', () => {
 
     it('should not override status when record is SKIPPED', () => {
       const source = [createSourceComponent('Cmp1', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.updateWithStatus(
         new Set([{ typeName: 'LightningComponentBundle', componentName: 'Cmp1' }]),
         EnrichmentStatus.SKIPPED
@@ -200,16 +191,16 @@ describe('EnrichmentRecords', () => {
 
   describe('generateSkipReasons', () => {
     it('should set message for skipped record when component not in source', () => {
-      const records = new EnrichmentRecords([], errorMessages);
+      const records = new EnrichmentRecords([]);
       records.addSkippedComponents(new Set([{ typeName: 'LightningComponentBundle', componentName: 'Missing' }]));
       records.generateSkipReasons(new Set([{ typeName: 'LightningComponentBundle', componentName: 'Missing' }]), []);
       const record = Array.from(records.recordSet)[0];
-      expect(record.message).to.equal('errors.component.not.found');
+      expect(record.message).to.equal('Component not found in project.');
     });
 
     it('should set LWC-only message for skipped non-LWC component', () => {
       const source = [createSourceComponent('MyClass', 'ApexClass')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.addSkippedComponents(new Set([{ typeName: 'ApexClass', componentName: 'MyClass' }]));
       records.updateWithStatus(
         new Set([{ typeName: 'ApexClass', componentName: 'MyClass' }]),
@@ -217,12 +208,12 @@ describe('EnrichmentRecords', () => {
       );
       records.generateSkipReasons(new Set([{ typeName: 'ApexClass', componentName: 'MyClass' }]), source);
       const record = Array.from(records.recordSet)[0];
-      expect(record.message).to.equal('errors.lwc.only');
+      expect(record.message).to.equal('Only Lightning Web Components are currently supported for enrichment.');
     });
 
     it('should set lwc.configuration.not.found for LWC without xml', () => {
       const source = [createSourceComponent('NoMeta', 'LightningComponentBundle')];
-      const records = new EnrichmentRecords(source, errorMessages);
+      const records = new EnrichmentRecords(source);
       records.addSkippedComponents(new Set([{ typeName: 'LightningComponentBundle', componentName: 'NoMeta' }]));
       records.updateWithStatus(
         new Set([{ typeName: 'LightningComponentBundle', componentName: 'NoMeta' }]),
@@ -230,7 +221,7 @@ describe('EnrichmentRecords', () => {
       );
       records.generateSkipReasons(new Set([{ typeName: 'LightningComponentBundle', componentName: 'NoMeta' }]), source);
       const record = Array.from(records.recordSet)[0];
-      expect(record.message).to.equal('errors.lwc.configuration.not.found');
+      expect(record.message).to.equal('The Lightning Web Component configuration file doesn\'t exist (\\*.js-meta.xml).');
     });
   });
 });

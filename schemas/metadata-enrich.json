@@ -18,7 +18,10 @@
               }
             }
           },
-          "required": ["count", "components"],
+          "required": [
+            "count",
+            "components"
+          ],
           "additionalProperties": false
         },
         "fail": {
@@ -34,7 +37,10 @@
               }
             }
           },
-          "required": ["count", "components"],
+          "required": [
+            "count",
+            "components"
+          ],
           "additionalProperties": false
         },
         "skipped": {
@@ -50,15 +56,24 @@
               }
             }
           },
-          "required": ["count", "components"],
+          "required": [
+            "count",
+            "components"
+          ],
           "additionalProperties": false
         },
         "total": {
           "type": "number"
         }
       },
-      "required": ["success", "fail", "skipped", "total"],
-      "additionalProperties": false
+      "required": [
+        "success",
+        "fail",
+        "skipped",
+        "total"
+      ],
+      "additionalProperties": false,
+      "description": "A metrics data object for storing the final enrichment results. This includes components that were successfully enriched, failed, or skipped. This metrics object can be used to generate the final console or json output."
     },
     "ComponentEnrichmentStatus": {
       "type": "object",
@@ -74,7 +89,11 @@
           "type": "string"
         }
       },
-      "required": ["componentName", "message", "typeName"]
+      "required": [
+        "componentName",
+        "message",
+        "typeName"
+      ]
     }
   }
 }
