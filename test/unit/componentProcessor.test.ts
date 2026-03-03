@@ -16,7 +16,7 @@
 
 import { expect } from 'chai';
 import type { SourceComponent } from '@salesforce/source-deploy-retrieve';
-import { ComponentProcessor } from '@salesforce/metadata-enrichment';
+import { SourceComponentProcessor } from '@salesforce/metadata-enrichment';
 
 function createSourceComponent(name: string, typeName: string, options?: { xml?: string }): SourceComponent {
   return {
@@ -30,19 +30,19 @@ function createSourceComponent(name: string, typeName: string, options?: { xml?:
 describe('ComponentProcessor', () => {
   describe('getComponentsToSkip', () => {
     it('should return empty set when sourceComponents and metadataEntries are empty', () => {
-      const result = ComponentProcessor.getComponentsToSkip([], [], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip([], [], undefined);
       expect(result.size).to.equal(0);
     });
 
     it('should return empty set when requested LWC exists in source with xml', () => {
       const source = [createSourceComponent('MyCmp', 'LightningComponentBundle', { xml: 'mycmp.js-meta.xml' })];
-      const result = ComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:MyCmp'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:MyCmp'], undefined);
       expect(result.size).to.equal(0);
     });
 
     it('should include requested component when not in source (missing)', () => {
       const source = [createSourceComponent('OtherCmp', 'LightningComponentBundle', { xml: 'other.js-meta.xml' })];
-      const result = ComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:MissingCmp'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:MissingCmp'], undefined);
       expect(result.size).to.be.greaterThan(0);
       const skipNames = Array.from(result).map((r) => r.componentName);
       expect(skipNames).to.include('MissingCmp');
@@ -50,7 +50,7 @@ describe('ComponentProcessor', () => {
 
     it('should include non-LWC component in skip set', () => {
       const source = [createSourceComponent('MyClass', 'ApexClass')];
-      const result = ComponentProcessor.getComponentsToSkip(source, ['ApexClass:MyClass'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['ApexClass:MyClass'], undefined);
       expect(result.size).to.be.greaterThan(0);
       const skipEntries = Array.from(result);
       expect(skipEntries.some((r) => r.componentName === 'MyClass' && r.typeName === 'ApexClass')).to.be.true;
@@ -58,14 +58,14 @@ describe('ComponentProcessor', () => {
 
     it('should include LWC without xml in skip set', () => {
       const source = [createSourceComponent('NoMetaCmp', 'LightningComponentBundle')];
-      const result = ComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:NoMetaCmp'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:NoMetaCmp'], undefined);
       expect(result.size).to.be.greaterThan(0);
       expect(Array.from(result).some((r) => r.componentName === 'NoMetaCmp')).to.be.true;
     });
 
     it('should not include wildcard metadata entries in requested (no missing from wildcard)', () => {
       const source: SourceComponent[] = [];
-      const result = ComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:*'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:*'], undefined);
       expect(result.size).to.equal(0);
     });
   });

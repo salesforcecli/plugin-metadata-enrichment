@@ -18,7 +18,7 @@ import { MultiStageOutput } from '@oclif/multi-stage-output';
 import { Messages, SfProject } from '@salesforce/core';
 import { Flags, SfCommand, Ux } from '@salesforce/sf-plugins-core';
 import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
-import { ComponentProcessor, EnrichmentHandler, EnrichmentMetrics, EnrichmentRecords, EnrichmentStatus, FileProcessor } from '@salesforce/metadata-enrichment';
+import { SourceComponentProcessor, EnrichmentHandler, EnrichmentMetrics, EnrichmentRecords, EnrichmentStatus, FileProcessor } from '@salesforce/metadata-enrichment';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
@@ -69,7 +69,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
     const projectSourceComponents = projectComponentSet.getSourceComponents().toArray();
     const enrichmentRecords = new EnrichmentRecords(projectSourceComponents);
 
-    const componentsToSkip = ComponentProcessor.getComponentsToSkip(
+    const componentsToSkip = SourceComponentProcessor.getComponentsToSkip(
       projectSourceComponents,
       metadataEntries,
       project.getPath()
@@ -95,7 +95,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
 
     mso.next();
 
-    const fileUpdatedRecords = await FileProcessor.updateMetadataFiles(
+    const fileUpdatedRecords = await FileProcessor.updateMetadata(
       componentsEligibleToProcess,
       enrichmentRecords.recordSet
     );
@@ -112,18 +112,21 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
         status: 'Success',
         type: c.typeName,
         component: c.componentName,
+        requestId: c.requestId,
         message: c.message,
       })),
       ...metrics.skipped.components.map((c) => ({
         status: 'Skipped',
         type: c.typeName,
         component: c.componentName,
+        requestId: c.requestId,
         message: c.message,
       })),
       ...metrics.fail.components.map((c) => ({
         status: 'Failed',
         type: c.typeName,
         component: c.componentName,
+        requestId: c.requestId,
         message: c.message,
       })),
     ];
@@ -134,6 +137,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
           { key: 'status', name: 'Status' },
           { key: 'type', name: 'Type' },
           { key: 'component', name: 'Component' },
+          { key: 'requestId', name: 'Request ID' },
           { key: 'message', name: 'Message' },
         ],
         data: tableRows,

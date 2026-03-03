@@ -64,6 +64,9 @@
         },
         "total": {
           "type": "number"
+        },
+        "requestId": {
+          "type": "string"
         }
       },
       "required": [
