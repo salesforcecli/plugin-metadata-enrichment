@@ -64,9 +64,6 @@
         },
         "total": {
           "type": "number"
-        },
-        "requestId": {
-          "type": "string"
         }
       },
       "required": [
@@ -83,6 +80,9 @@
       "additionalProperties": false,
       "properties": {
         "message": {
+          "type": "string"
+        },
+        "requestId": {
           "type": "string"
         },
         "typeName": {
