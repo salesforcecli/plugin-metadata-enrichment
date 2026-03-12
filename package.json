@@ -10,7 +10,7 @@
     "@oclif/table": "^0.5.1",
     "@salesforce/core": "^8.26.3",
     "@salesforce/kit": "^3.2.4",
-    "@salesforce/metadata-enrichment": "^0.0.8",
+    "@salesforce/metadata-enrichment": "^0.0.9",
     "@salesforce/sf-plugins-core": "^12",
     "@salesforce/source-deploy-retrieve": "^12.31.14"
   },
@@ -81,14 +81,6 @@
     "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
     "test:only": "wireit",
     "version": "oclif readme"
-  },
-  "overrides": {
-    "@salesforce/core": "^8.26.3",
-    "@salesforce/source-deploy-retrieve": "^12.31.14"
-  },
-  "resolutions": {
-    "@salesforce/core": "^8.26.3",
-    "@salesforce/source-deploy-retrieve": "^12.31.14"
   },
   "publishConfig": {
     "access": "public"
