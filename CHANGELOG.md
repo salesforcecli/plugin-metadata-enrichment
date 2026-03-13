@@ -1,3 +1,9 @@
+## [0.0.5](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.4...0.0.5) (2026-03-13)
+
+### Bug Fixes
+
+- dependency version conflicts ([#32](https://github.com/salesforcecli/plugin-metadata-enrichment/issues/32)) ([90805af](https://github.com/salesforcecli/plugin-metadata-enrichment/commit/90805afadb5f7585fc4eae477139496fbe7bc8f2))
+
 ## [0.0.4](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.3...0.0.4) (2026-03-05)
 
 ## [0.0.3](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.2...0.0.3) (2026-02-17)
