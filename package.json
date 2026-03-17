@@ -10,7 +10,7 @@
     "@oclif/table": "^0.5.1",
     "@salesforce/core": "^8.24.3",
     "@salesforce/kit": "^3.2.4",
-    "@salesforce/metadata-enrichment": "^0.0.10",
+    "@salesforce/metadata-enrichment": "^0.0.11",
     "@salesforce/sf-plugins-core": "^12",
     "@salesforce/source-deploy-retrieve": "^12.31.14"
   },
