@@ -1,3 +1,9 @@
+## [0.0.6](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.5...0.0.6) (2026-03-17)
+
+### Bug Fixes
+
+- stopgap enrichment fix through default max tokens ([#38](https://github.com/salesforcecli/plugin-metadata-enrichment/issues/38)) ([ce60a64](https://github.com/salesforcecli/plugin-metadata-enrichment/commit/ce60a641ab871593dcea30bde3b315157dea304b))
+
 ## [0.0.5](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.4...0.0.5) (2026-03-13)
 
 ### Bug Fixes
