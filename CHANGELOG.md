@@ -1,3 +1,9 @@
+## [0.0.8](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.7...0.0.8) (2026-03-24)
+
+### Bug Fixes
+
+- update metadata-enrichment library version ([#41](https://github.com/salesforcecli/plugin-metadata-enrichment/issues/41)) ([9e9184b](https://github.com/salesforcecli/plugin-metadata-enrichment/commit/9e9184b04a07722a05ae1fe53c3930fce236f903))
+
 ## [0.0.7](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.6...0.0.7) (2026-03-17)
 
 ### Bug Fixes
