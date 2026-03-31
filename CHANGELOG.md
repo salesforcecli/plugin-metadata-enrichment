@@ -1,3 +1,9 @@
+## [0.0.9](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.8...0.0.9) (2026-03-31)
+
+### Bug Fixes
+
+- custom object schema ([#44](https://github.com/salesforcecli/plugin-metadata-enrichment/issues/44)) ([e7c8aa7](https://github.com/salesforcecli/plugin-metadata-enrichment/commit/e7c8aa7264848f0dd4630934b69b636fbae6d914))
+
 ## [0.0.8](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.7...0.0.8) (2026-03-24)
 
 ### Bug Fixes
