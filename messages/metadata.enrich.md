@@ -12,7 +12,12 @@ To enrich multiple metadata components, specify multiple --metadata <name> flags
 
 Even though this command updates only local files in your DX project, you're still required to authorize and specify an org, which is how the command accesses a large language model (LLM).
 
-Currently, this command supports enriching only Lightning Web Components, represented by the LightningComponentBundle metadata type.
+This command currently supports the following metadata types:
+
+- LightningComponentBundle
+- FlexiPage
+- CustomObject
+- LightningTypeBundle
 
 Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
 
@@ -33,6 +38,10 @@ Your org must be eligible for metadata enrichment. Your Salesforce admin can hel
 - Enrich metadata for multiple LightningComponentBundles using a matching wildcard:
 
   <%= config.bin %> <%= command.id %> --metadata "LightningComponentBundle:Component\*"
+
+- Enrich metadata for a LightningComponentBundle and CustomObject:
+
+  <%= config.bin %> <%= command.id %> --metadata LightningComponentBundle:Component1 --metadata CustomObject:Component2
 
 # flags.metadata.summary
 
