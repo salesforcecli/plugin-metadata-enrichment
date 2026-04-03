@@ -1,3 +1,9 @@
+# [0.1.0](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.9...0.1.0) (2026-04-03)
+
+### Features
+
+- update command help text with new supported types ([#45](https://github.com/salesforcecli/plugin-metadata-enrichment/issues/45)) ([ad24657](https://github.com/salesforcecli/plugin-metadata-enrichment/commit/ad246576330a0c4e0bcdca23815143a6325d8a6a))
+
 ## [0.0.9](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.8...0.0.9) (2026-03-31)
 
 ### Bug Fixes

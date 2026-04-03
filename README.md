@@ -99,8 +99,12 @@ DESCRIPTION
   Even though this command updates only local files in your DX project, you're still required to authorize and specify
   an org, which is how the command accesses a large language model (LLM).
 
-  Currently, this command supports enriching only Lightning Web Components, represented by the LightningComponentBundle
-  metadata type.
+  This command currently supports the following metadata types:
+
+  - LightningComponentBundle
+  - FlexiPage
+  - CustomObject
+  - LightningTypeBundle
 
   Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
 
@@ -122,12 +126,16 @@ EXAMPLES
 
     $ sf metadata enrich --metadata "LightningComponentBundle:Component\*"
 
+  Enrich metadata for a LightningComponentBundle and CustomObject:
+
+    $ sf metadata enrich --metadata LightningComponentBundle:Component1 --metadata CustomObject:Component2
+
 FLAG DESCRIPTIONS
   -m, --metadata=<value>...  Metadata type and optional component name to enrich.
 
     Wildcards ("_") are supported as long as you use double quotes, such as "LightningComponentBundle:MyClass_".
 ```
 
-_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/0.0.9/src/commands/metadata/enrich.ts)_
+_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/0.1.0/src/commands/metadata/enrich.ts)_
 
 <!-- commandsstop -->
