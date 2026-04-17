@@ -18,11 +18,19 @@ import { MultiStageOutput } from '@oclif/multi-stage-output';
 import { Messages, SfProject } from '@salesforce/core';
 import { Flags, SfCommand, Ux } from '@salesforce/sf-plugins-core';
 import { ComponentSetBuilder } from '@salesforce/source-deploy-retrieve';
-import { SourceComponentProcessor, EnrichmentHandler, EnrichmentMetrics, EnrichmentRecords, FileProcessor } from '@salesforce/metadata-enrichment';
+import {
+  SourceComponentProcessor,
+  EnrichmentHandler,
+  EnrichmentMetrics,
+  EnrichmentRecords,
+  FileProcessor,
+} from '@salesforce/metadata-enrichment';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
 const metricsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metrics');
+
+export const SUPPORTED_METADATA_TYPES = ['CustomObject', 'LightningComponentBundle'] as const;
 
 export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
   public static readonly summary = commandMessages.getMessage('summary');
@@ -49,7 +57,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
 
     const STAGES_MSO = [
       commandMessages.getMessage('stage.setup'),
-      commandMessages.getMessage('stage.executing'), 
+      commandMessages.getMessage('stage.executing'),
       commandMessages.getMessage('stage.updating.files'),
     ];
 

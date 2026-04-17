@@ -14,10 +14,8 @@ Even though this command updates only local files in your DX project, you're sti
 
 This command currently supports the following metadata types:
 
-- LightningComponentBundle
-- FlexiPage
 - CustomObject
-- LightningTypeBundle
+- LightningComponentBundle
 
 Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
 
