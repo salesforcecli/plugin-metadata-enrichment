@@ -30,8 +30,6 @@ Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const commandMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metadata.enrich');
 const metricsMessages = Messages.loadMessages('@salesforce/plugin-metadata-enrichment', 'metrics');
 
-export const SUPPORTED_METADATA_TYPES = ['CustomObject', 'LightningComponentBundle'] as const;
-
 export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
   public static readonly summary = commandMessages.getMessage('summary');
   public static readonly description = commandMessages.getMessage('description');

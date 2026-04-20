@@ -101,8 +101,8 @@ DESCRIPTION
 
   This command currently supports the following metadata types:
 
-  - CustomObject
   - LightningComponentBundle
+  - CustomObject
 
   Your org must be eligible for metadata enrichment. Your Salesforce admin can help with that.
 
