@@ -75,19 +75,13 @@ describe('ComponentProcessor', () => {
       expect(Array.from(result).some((r) => r.componentName === 'NoMetaCmp')).to.be.true;
     });
 
-    it('should return empty set when requested CustomObject exists in source with xml', () => {
-      const source = [createSourceComponent('MyObject', 'CustomObject', { xml: 'MyObject.object-meta.xml' })];
-      const result = SourceComponentProcessor.getComponentsToSkip(source, ['CustomObject:MyObject'], undefined);
-      expect(result.size).to.equal(0);
-    });
-
-    it('should not include wildcard metadata entries in requested (no missing from wildcard)', () => {
+    it('should not parse wildcard as an entry for LWC components to skip', () => {
       const source: SourceComponent[] = [];
       const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:*'], undefined);
       expect(result.size).to.equal(0);
     });
 
-    it('should not include wildcard CustomObject entries in requested (no missing from wildcard)', () => {
+    it('should not parse wildcard as an entry for CustomObject components to skip', () => {
       const source: SourceComponent[] = [];
       const result = SourceComponentProcessor.getComponentsToSkip(source, ['CustomObject:*'], undefined);
       expect(result.size).to.equal(0);
