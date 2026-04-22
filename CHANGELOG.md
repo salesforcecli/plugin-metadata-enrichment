@@ -1,3 +1,5 @@
+## [0.1.1](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.1.0...0.1.1) (2026-04-22)
+
 # [0.1.0](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.0.9...0.1.0) (2026-04-03)
 
 ### Features
