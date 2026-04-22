@@ -36,36 +36,54 @@ describe('ComponentProcessor', () => {
 
     it('should return empty set when requested LWC exists in source with xml', () => {
       const source = [createSourceComponent('MyCmp', 'LightningComponentBundle', { xml: 'mycmp.js-meta.xml' })];
-      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:MyCmp'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(
+        source,
+        ['LightningComponentBundle:MyCmp'],
+        undefined
+      );
       expect(result.size).to.equal(0);
     });
 
     it('should include requested component when not in source (missing)', () => {
       const source = [createSourceComponent('OtherCmp', 'LightningComponentBundle', { xml: 'other.js-meta.xml' })];
-      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:MissingCmp'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(
+        source,
+        ['LightningComponentBundle:MissingCmp'],
+        undefined
+      );
       expect(result.size).to.be.greaterThan(0);
       const skipNames = Array.from(result).map((r) => r.componentName);
       expect(skipNames).to.include('MissingCmp');
     });
 
-    it('should include non-LWC component in skip set', () => {
-      const source = [createSourceComponent('MyClass', 'ApexClass')];
-      const result = SourceComponentProcessor.getComponentsToSkip(source, ['ApexClass:MyClass'], undefined);
+    it('should include requested CustomObject in skip set when missing from source', () => {
+      const source = [createSourceComponent('OtherObject', 'CustomObject')];
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['CustomObject:MissingObject'], undefined);
       expect(result.size).to.be.greaterThan(0);
-      const skipEntries = Array.from(result);
-      expect(skipEntries.some((r) => r.componentName === 'MyClass' && r.componentType.name === 'ApexClass')).to.be.true;
+      const skipNames = Array.from(result).map((r) => r.componentName);
+      expect(skipNames).to.include('MissingObject');
     });
 
     it('should include LWC without xml in skip set', () => {
       const source = [createSourceComponent('NoMetaCmp', 'LightningComponentBundle')];
-      const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:NoMetaCmp'], undefined);
+      const result = SourceComponentProcessor.getComponentsToSkip(
+        source,
+        ['LightningComponentBundle:NoMetaCmp'],
+        undefined
+      );
       expect(result.size).to.be.greaterThan(0);
       expect(Array.from(result).some((r) => r.componentName === 'NoMetaCmp')).to.be.true;
     });
 
-    it('should not include wildcard metadata entries in requested (no missing from wildcard)', () => {
+    it('should not parse wildcard as an entry for LWC components to skip', () => {
       const source: SourceComponent[] = [];
       const result = SourceComponentProcessor.getComponentsToSkip(source, ['LightningComponentBundle:*'], undefined);
+      expect(result.size).to.equal(0);
+    });
+
+    it('should not parse wildcard as an entry for CustomObject components to skip', () => {
+      const source: SourceComponent[] = [];
+      const result = SourceComponentProcessor.getComponentsToSkip(source, ['CustomObject:*'], undefined);
       expect(result.size).to.equal(0);
     });
   });
