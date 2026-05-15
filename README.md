@@ -59,6 +59,47 @@ sf plugins link .
 sf plugins
 ```
 
+## Testing
+
+### Non-Unit Tests (NUTs)
+
+NUTs live in `test/nuts/` and run against a real Salesforce org using [`@salesforce/cli-plugins-testkit`](https://github.com/salesforcecli/cli-plugins-testkit) and [`@salesforce/source-testkit`](https://github.com/salesforcecli/source-testkit).
+
+```bash
+yarn test:nuts
+```
+
+#### NUT structure conventions
+
+**Consolidate assertions on the same command output into a single `it` block.**
+Each `execCmd` call spins up a real CLI process against a real org — it is expensive. Group all assertions on the same result together rather than running the same command once per assertion.
+
+```ts
+// good — one org call, all related assertions together
+it('should successfully enrich a single component', () => {
+  const result = execCmd(`metadata enrich --metadata ${COMPONENT} --json`, { ensureExitCode: 0 });
+  const { stdout } = result.shellOutput;
+  expect(stdout).to.include('Total Components Processed: 1');
+  // ... more assertions
+});
+
+// avoid — five org calls to check five things about the same output
+it('should report 1 component', ...);
+it('should show component name', ...);
+it('should show Success status', ...);
+```
+
+Split into separate `it` blocks only when the assertions cover genuinely independent scenarios (e.g. a success case vs. an error case).
+
+**Always run two separate invocations: one without `--json` and one with `--json`.**
+
+This command outputs both the human-readable table _and_ the JSON block when `--json` is passed (non-standard oclif behavior). Even so, two invocations are kept intentionally:
+
+- **Human output** (`stdout` without `--json`) verifies the user-facing display — table formatting, "Total Components Processed", status labels. This is a separate code path from JSON serialization and can regress independently.
+- **JSON output** (with `--json`) verifies the machine-readable contract — field names, counts, and structure that scripts and CI pipelines depend on. It is also type-safe via `execCmd<EnrichmentMetrics>`, catching schema drift at compile time.
+
+The standard oclif convention (followed by all official Salesforce CLI reference plugins such as [`plugin-config`](https://github.com/salesforcecli/plugin-config) and [`plugin-alias`](https://github.com/salesforcecli/plugin-alias)) is to treat these as independent concerns and test them separately. If this command is ever refactored to suppress human output when `--json` is passed (standard oclif behavior), the two-invocation pattern will already be correct without any test changes.
+
 ## Commands
 
 <!-- commands -->
