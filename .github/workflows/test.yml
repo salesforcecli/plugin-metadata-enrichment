@@ -40,9 +40,6 @@ jobs:
   # retry/cache/install conventions, and inject the extra non-pilot secrets as
   # env on the NUT step. Linux-only because this single test runs against one
   # stable org and doesn't need cross-OS coverage.
-  #
-  # When upstream nut.yml changes, the .github/workflows/upstream-nut-watch.yml
-  # job (or RSS feed on the upstream file) prompts us to re-audit the steps below.
   nuts-pilot-perm-disabled:
     needs: linux-unit-tests
     if: github.repository == 'salesforcecli/plugin-metadata-enrichment'

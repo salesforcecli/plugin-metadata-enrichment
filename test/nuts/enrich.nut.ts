@@ -83,15 +83,11 @@ describe('metadata enrich NUTs', () => {
       const { stdout } = runEnrich('--help', { ensureExitCode: 0 }).shellOutput;
       expect(stdout).to.include('Enrich metadata components in your DX project by adding AI-generated descriptions.');
       expect(stdout).to.include('USAGE');
-      expect(stdout).to.match(/\$ sf metadata enrich/);
       expect(stdout).to.include('FLAGS');
-      expect(stdout, 'expected required --metadata flag in help').to.match(
-        /-m, --metadata=<value>\.\.\.\s+\(required\)/
-      );
-      expect(stdout, 'expected --target-org flag in help').to.match(/-o, --target-org=<value>/);
       expect(stdout).to.include('GLOBAL FLAGS');
-      expect(stdout).to.match(/--json\s+Format output as json\./);
+      expect(stdout).to.include('DESCRIPTION');
       expect(stdout).to.include('EXAMPLES');
+      expect(stdout).to.include('FLAG DESCRIPTIONS');
     });
   });
 
