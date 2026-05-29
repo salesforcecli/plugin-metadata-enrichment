@@ -1543,7 +1543,7 @@
     strip-ansi "6.0.1"
     ts-retry-promise "^0.8.1"
 
-"@salesforce/core@^8.18.7", "@salesforce/core@^8.23.1", "@salesforce/core@^8.23.3", "@salesforce/core@^8.24.0", "@salesforce/core@^8.24.3", "@salesforce/core@^8.27.0", "@salesforce/core@^8.29.1", "@salesforce/core@^8.5.1":
+"@salesforce/core@^8.18.7", "@salesforce/core@^8.23.1", "@salesforce/core@^8.23.3", "@salesforce/core@^8.24.0", "@salesforce/core@^8.24.3", "@salesforce/core@^8.27.0", "@salesforce/core@^8.29.0", "@salesforce/core@^8.29.1", "@salesforce/core@^8.30.3", "@salesforce/core@^8.5.1":
   version "8.30.0"
   resolved "https://registry.npmjs.org/@salesforce/core/-/core-8.30.0.tgz"
   integrity sha512-BzKIKAqKKB+obt6KlP3LEOB9kWb6MCFmmzkDiEEyeqENQCDJr/IIps6tZG3VM7RgbNxvu/A8GIS7yIkoyGnqIg==
@@ -1619,14 +1619,14 @@
   dependencies:
     "@salesforce/ts-types" "^2.0.12"
 
-"@salesforce/metadata-enrichment@^0.0.15":
-  version "0.0.15"
-  resolved "https://registry.npmjs.org/@salesforce/metadata-enrichment/-/metadata-enrichment-0.0.15.tgz"
-  integrity sha512-Kk/lFavDJeNOW84aPAOWFEwHBBwM8I3riHQpRxk1nep9NK5Vp1yqZ5/lNubR3/ssDj5OS8ZZnNmGyktUqWHjUg==
+"@salesforce/metadata-enrichment@^0.0.17":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@salesforce/metadata-enrichment/-/metadata-enrichment-0.0.17.tgz#f26c1741a02b498c27ef8a0d72ef7e4811bbd1dc"
+  integrity sha512-QC2ioVxBSrsvTd4tB5YVHBf7h0EHIH/djKJfnL2pGipb2Sb1+5GRVLM4/gBwRON7G6qCqOgQqNaIQrGZ+LU+RQ==
   dependencies:
-    "@salesforce/core" "^8.24.3"
+    "@salesforce/core" "^8.29.0"
     "@salesforce/kit" "^3.2.4"
-    "@salesforce/source-deploy-retrieve" "^12.31.14"
+    "@salesforce/source-deploy-retrieve" "^12.35.0"
     "@salesforce/ts-types" "^2.0.11"
     fast-xml-parser "^5.5.7"
 
@@ -1683,7 +1683,7 @@
     cli-progress "^3.12.0"
     terminal-link "^3.0.0"
 
-"@salesforce/source-deploy-retrieve@^12.31.0", "@salesforce/source-deploy-retrieve@^12.31.14":
+"@salesforce/source-deploy-retrieve@^12.31.0":
   version "12.31.21"
   resolved "https://registry.npmjs.org/@salesforce/source-deploy-retrieve/-/source-deploy-retrieve-12.31.21.tgz"
   integrity sha512-NZsJlvIrfIIZF03P7iLLmewjYkMsGSIV83+O5k+HGBvDDU8c2IJge3MIV/N78GSAGYahtSE+yR4x75UY0Of7qw==
@@ -1702,6 +1702,26 @@
     minimatch "^9.0.5"
     proxy-agent "^6.4.0"
     yaml "^2.8.1"
+
+"@salesforce/source-deploy-retrieve@^12.35.0":
+  version "12.35.10"
+  resolved "https://registry.yarnpkg.com/@salesforce/source-deploy-retrieve/-/source-deploy-retrieve-12.35.10.tgz#e4a5a4a691f9a74f80c8a01da05800aedd5c24cd"
+  integrity sha512-njg3pt0aqwUF5xCleO6wMN45+AIbhpG9xOExWz3io+Qy2uWW75WoHdcj3ZTZFLKqyHBc2NNSfDJc+QYEnJccGg==
+  dependencies:
+    "@salesforce/core" "^8.30.3"
+    "@salesforce/kit" "^3.2.4"
+    "@salesforce/ts-types" "^2.0.12"
+    "@salesforce/types" "^1.6.0"
+    fast-levenshtein "^3.0.0"
+    fast-xml-parser "^5.7.3"
+    got "^11.8.6"
+    graceful-fs "^4.2.11"
+    ignore "^5.3.2"
+    jszip "^3.10.1"
+    mime "2.6.0"
+    minimatch "^9.0.9"
+    proxy-agent "^6.5.0"
+    yaml "^2.8.3"
 
 "@salesforce/source-testkit@^2.2.172":
   version "2.2.172"
@@ -3066,6 +3086,13 @@ brace-expansion@^2.0.1:
   dependencies:
     balanced-match "^1.0.0"
 
+brace-expansion@^2.0.2:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-2.1.1.tgz#c68b1c4111c76aae3a6fba55d496cee10c39dad8"
+  integrity sha512-WR1cURNjuvBLMZBMbqM0UoE+WAfdUcEV1ccD8PVBVOI+Z3ND4+SZbN8RsfT2bMuG1qwz5RFvPukSZm5fF2D5eA==
+  dependencies:
+    balanced-match "^1.0.0"
+
 brace-expansion@^4.0.0:
   version "4.0.1"
   resolved "https://registry.npmjs.org/brace-expansion/-/brace-expansion-4.0.1.tgz"
@@ -4389,7 +4416,7 @@ fast-xml-builder@^1.1.2:
   dependencies:
     path-expression-matcher "^1.1.3"
 
-fast-xml-builder@^1.1.7:
+fast-xml-builder@^1.1.7, fast-xml-builder@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/fast-xml-builder/-/fast-xml-builder-1.2.0.tgz"
   integrity sha512-00aAWieqff+ZJhsXA4g1g7M8k+7AYoMUUHF+/zFb5U6Uv/P0Vl4QZo84/IcufzYalLuEj9928bXN9PbbFzMF0Q==
@@ -4422,6 +4449,17 @@ fast-xml-parser@^5.5.7:
     fast-xml-builder "^1.1.7"
     path-expression-matcher "^1.5.0"
     strnum "^2.2.3"
+
+fast-xml-parser@^5.7.3:
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/fast-xml-parser/-/fast-xml-parser-5.8.0.tgz#64d71f0f8d4bf23621dffd762aef7e98c1884fc1"
+  integrity sha512-6bIM7fsJxeo3uXv7OncQYsBAMPJ7V16Slahl/6M98C/i2q+vB1+4a0MtrvYwDFEUrwDSbAmeLDRXsOBwrL7yAg==
+  dependencies:
+    "@nodable/entities" "^2.1.0"
+    fast-xml-builder "^1.2.0"
+    path-expression-matcher "^1.5.0"
+    strnum "^2.3.0"
+    xml-naming "^0.1.0"
 
 fastest-levenshtein@^1.0.7:
   version "1.0.16"
@@ -6302,6 +6340,13 @@ minimatch@^9.0.4, minimatch@^9.0.5:
   dependencies:
     brace-expansion "^2.0.1"
 
+minimatch@^9.0.9:
+  version "9.0.9"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-9.0.9.tgz#9b0cb9fcb78087f6fd7eababe2511c4d3d60574e"
+  integrity sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==
+  dependencies:
+    brace-expansion "^2.0.2"
+
 minimist-options@4.1.0:
   version "4.1.0"
   resolved "https://registry.npmjs.org/minimist-options/-/minimist-options-4.1.0.tgz"
@@ -7032,9 +7077,9 @@ proto-list@~1.2.1:
   resolved "https://registry.npmjs.org/proto-list/-/proto-list-1.2.4.tgz"
   integrity sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==
 
-proxy-agent@^6.4.0:
+proxy-agent@^6.4.0, proxy-agent@^6.5.0:
   version "6.5.0"
-  resolved "https://registry.npmjs.org/proxy-agent/-/proxy-agent-6.5.0.tgz"
+  resolved "https://registry.yarnpkg.com/proxy-agent/-/proxy-agent-6.5.0.tgz#9e49acba8e4ee234aacb539f89ed9c23d02f232d"
   integrity sha512-TmatMXdr2KlRiA2CyDu8GqR8EjahTG3aY3nXjdzFyoZbmB8hrBsTyMezhULIXKnC0jpfjlmiZ3+EaCzoInSu/A==
   dependencies:
     agent-base "^7.1.2"
@@ -7978,6 +8023,11 @@ strnum@^2.2.3:
   resolved "https://registry.npmjs.org/strnum/-/strnum-2.2.3.tgz"
   integrity sha512-oKx6RUCuHfT3oyVjtnrmn19H1SiCqgJSg+54XqURKp5aCMbrXrhLjRN9TjuwMjiYstZ0MzDrHqkGZ5dFTKd+zg==
 
+strnum@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/strnum/-/strnum-2.3.0.tgz#81bfbfef53db8c3217ea62a98c026886ec4a2761"
+  integrity sha512-ums3KNd42PGyx5xaoVTO1mjU1bH3NpY4vsrVlnv9PNGqQj8wd7rJ6nEypLrJ7z5vxK5RP0yMLo6J/Gsm62DI5Q==
+
 supports-color@^7, supports-color@^7.0.0, supports-color@^7.1.0:
   version "7.2.0"
   resolved "https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz"
@@ -8719,6 +8769,11 @@ yaml@^2.5.1, yaml@^2.8.1:
   version "2.8.2"
   resolved "https://registry.npmjs.org/yaml/-/yaml-2.8.2.tgz"
   integrity sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==
+
+yaml@^2.8.3:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.9.0.tgz#78274afd93598a1dfdd6130df6a566defcbf9aa4"
+  integrity sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==
 
 yargs-parser@^18.1.2:
   version "18.1.3"
