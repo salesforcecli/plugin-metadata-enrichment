@@ -134,6 +134,6 @@ FLAG DESCRIPTIONS
     Wildcards ("_") are supported as long as you use double quotes, such as "LightningComponentBundle:MyClass_".
 ```
 
-_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/0.1.1/src/commands/metadata/enrich.ts)_
+_See code: [src/commands/metadata/enrich.ts](https://github.com/salesforcecli/plugin-metadata-enrichment/blob/0.1.2/src/commands/metadata/enrich.ts)_
 
 <!-- commandsstop -->
