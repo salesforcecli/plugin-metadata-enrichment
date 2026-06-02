@@ -157,9 +157,6 @@ describe('metadata enrich NUTs', () => {
   describe('--json', () => {
     it('should emit a status:0 JSON envelope with success-only metrics for a successful enrich', () => {
       // testkit auto-parses stdout when --json is present and stdout is a single JSON document.
-      // jsonOutput is the full envelope ({ status, result, warnings }); jsonError is set if parsing fails.
-      // The result body is the command's own EnrichmentMetrics shape (serialized to JSON).
-      // If the human-readable table ever leaks back into stdout, the parse breaks and this test fails.
       const result = runEnrich<EnrichmentMetrics>(`--target-org ${TARGET_ORG} --metadata ${SAMPLE_LWC} --json`, {
         ensureExitCode: 0,
       });
