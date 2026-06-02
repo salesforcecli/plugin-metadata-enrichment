@@ -108,7 +108,7 @@ export default class MetadataEnrich extends SfCommand<EnrichmentMetrics> {
     mso.stop();
 
     const metrics = EnrichmentMetrics.createEnrichmentMetrics(Array.from(enrichmentRecords.recordSet));
-    const ux = new Ux();
+    const ux = new Ux({ jsonEnabled: this.jsonEnabled() });
     ux.log('');
     ux.log(metricsMessages.getMessage('metrics.total.count', [metrics.total]));
     const tableRows = [

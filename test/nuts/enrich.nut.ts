@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { expect } from 'chai';
 import { execCmd } from '@salesforce/cli-plugins-testkit';
 import { SourceTestkit } from '@salesforce/source-testkit';
+import type { EnrichmentMetrics } from '@salesforce/metadata-enrichment';
 
 const REPO = 'https://github.com/trailheadapps/dreamhouse-lwc.git';
 const SAMPLE_LWC = 'LightningComponentBundle:barcodeScanner'; // LWC from dreamhouse-lwc
@@ -72,8 +73,8 @@ describe('metadata enrich NUTs', () => {
     await testkit?.clean();
   });
 
-  const runEnrich = (args: string, options?: { ensureExitCode?: number }) =>
-    execCmd(`metadata enrich ${args}`, {
+  const runEnrich = <T = unknown>(args: string, options?: { ensureExitCode?: number }) =>
+    execCmd<T>(`metadata enrich ${args}`, {
       cwd: testkit.projectDir,
       ...options,
     });
@@ -154,36 +155,33 @@ describe('metadata enrich NUTs', () => {
   });
 
   describe('--json', () => {
-    type EnrichJson = {
-      status: number;
-      result: {
-        success: { count: number; components: Array<{ typeName: string; componentName: string; requestId: string }> };
-        fail: { count: number; components: unknown[] };
-        skipped: { count: number; components: unknown[] };
-        total: number;
-      };
-    };
-
-    // The plugin currently prints the human-readable table to stdout in addition to the JSON envelope,
-    // so testkit's parseJson rejects the combined output. We pull the trailing JSON object out of stdout.
-    const extractJsonEnvelope = (stdout: string): EnrichJson => {
-      const match = stdout.match(/\{[\s\S]*\}\s*$/);
-      expect(match, 'expected stdout to contain a trailing JSON envelope').to.not.be.null;
-      return JSON.parse(match![0]) as EnrichJson;
-    };
-
     it('should emit a status:0 JSON envelope with success-only metrics for a successful enrich', () => {
-      const { stdout } = runEnrich(`--target-org ${TARGET_ORG} --metadata ${SAMPLE_LWC} --json`, {
+      // testkit auto-parses stdout when --json is present and stdout is a single JSON document.
+      // jsonOutput is the full envelope ({ status, result, warnings }); jsonError is set if parsing fails.
+      // The result body is the command's own EnrichmentMetrics shape (serialized to JSON).
+      // If the human-readable table ever leaks back into stdout, the parse breaks and this test fails.
+      const result = runEnrich<EnrichmentMetrics>(`--target-org ${TARGET_ORG} --metadata ${SAMPLE_LWC} --json`, {
         ensureExitCode: 0,
-      }).shellOutput;
-      const json = extractJsonEnvelope(stdout);
-      expect(json.status).to.equal(0);
-      expect(json.result.total).to.equal(1);
-      expect(json.result.success.count).to.equal(1);
-      expect(json.result.fail.count).to.equal(0);
-      expect(json.result.skipped.count).to.equal(0);
-      expect(json.result.success.components).to.have.lengthOf(1);
-      const [component] = json.result.success.components;
+      });
+      const { jsonOutput, jsonError } = result;
+      const { stdout } = result.shellOutput;
+
+      // Strongest regression lock: stdout must be a single parseable JSON document.
+      expect(jsonError, 'expected stdout to parse as a single JSON document').to.be.undefined;
+      expect(jsonOutput, 'expected a parsed JSON envelope').to.not.be.undefined;
+
+      // Human-readable output must be fully suppressed under --json.
+      expect(stdout, 'summary line must not leak into --json stdout').to.not.include('Total Components Processed');
+      expect(stdout, 'table header must not leak into --json stdout').to.not.include('Request ID');
+
+      expect(jsonOutput!.status).to.equal(0);
+      const { result: metrics } = jsonOutput!;
+      expect(metrics.total).to.equal(1);
+      expect(metrics.success.count).to.equal(1);
+      expect(metrics.fail.count).to.equal(0);
+      expect(metrics.skipped.count).to.equal(0);
+      expect(metrics.success.components).to.have.lengthOf(1);
+      const [component] = metrics.success.components;
       expect(component).to.include({
         typeName: 'LightningComponentBundle',
         componentName: 'barcodeScanner',
