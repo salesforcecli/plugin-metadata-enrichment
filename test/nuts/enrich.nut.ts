@@ -184,6 +184,10 @@ describe('metadata enrich NUTs', () => {
         componentName: 'barcodeScanner',
       });
       expect(component.requestId, 'expected a req- prefixed request ID in success component').to.match(/^req-\w+/);
+      // Core regression lock for this fix: the AI-generated description must be populated in --json output.
+      expect(component.description, 'expected AI-generated description in --json success component')
+        .to.be.a('string')
+        .and.to.have.length.greaterThan(0);
     });
   });
 
