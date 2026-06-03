@@ -1,3 +1,5 @@
+## [0.1.3](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.1.2...0.1.3) (2026-06-03)
+
 ## [0.1.2](https://github.com/salesforcecli/plugin-metadata-enrichment/compare/0.1.1...0.1.2) (2026-05-29)
 
 ### Bug Fixes
