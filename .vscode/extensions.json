@@ -1,0 +1,15 @@
+{
+  // This file lists recommended VSCode extensions for this project.
+  // To install all at once:
+  //   1. Open the Extensions panel (Cmd+Shift+X)
+  //   2. Type "@recommended" in the search bar
+  //   3. Click "Install All" at the top of the Workspace Recommendations section
+  // VSCode will also show an automatic popup to install these when you open this workspace.
+  "recommendations": [
+    "dbaeumer.vscode-eslint", // Runs ESLint inline using the project's .eslintrc.cjs config
+    "esbenp.prettier-vscode", // Auto-formats code using the project's .prettierrc.json config
+    "hbenl.vscode-mocha-test-adapter", // Run and debug Mocha tests from the Test Explorer sidebar
+    "streetsidesoftware.code-spell-checker", // Catches typos in code, comments, and message files
+    "salesforce.salesforcedx-vscode" // Salesforce CLI and metadata tooling support for sf plugins
+  ]
+}
