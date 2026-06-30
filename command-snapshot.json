@@ -1,10 +1,1 @@
-[
-  {
-    "alias": [],
-    "command": "metadata:enrich",
-    "flagAliases": [],
-    "flagChars": ["m", "o"],
-    "flags": ["target-org", "metadata", "flags-dir", "json"],
-    "plugin": "@salesforce/plugin-metadata-enrichment"
-  }
-]
+[]
