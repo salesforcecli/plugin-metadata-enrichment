@@ -4,21 +4,10 @@
   "version": "0.1.3",
   "author": "Salesforce",
   "bugs": "https://github.com/forcedotcom/cli/issues",
-  "dependencies": {
-    "@oclif/core": "^4",
-    "@oclif/multi-stage-output": "^0.8.30",
-    "@oclif/table": "^0.5.1",
-    "@salesforce/core": "^8.24.3",
-    "@salesforce/kit": "^3.2.4",
-    "@salesforce/sf-plugins-core": "^12",
-    "@salesforce/source-deploy-retrieve": "^12.35.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@oclif/plugin-command-snapshot": "^5.3.8",
-    "@salesforce/cli-plugins-testkit": "^5.3.57",
     "@salesforce/dev-scripts": "^11.0.4",
     "@salesforce/plugin-command-reference": "^3.1.79",
-    "@salesforce/source-testkit": "^2.2.172",
     "eslint-plugin-sf-plugin": "^1.20.33",
     "oclif": "^4.22.59",
     "ts-node": "^10.9.2",
@@ -50,7 +39,6 @@
     "topicSeparator": " ",
     "devPlugins": [
       "@oclif/plugin-help",
-      "@oclif/plugin-command-snapshot",
       "@salesforce/plugin-command-reference"
     ],
     "topics": {},
@@ -102,12 +90,11 @@
       "clean": "if-file-deleted"
     },
     "format": {
-      "command": "prettier --write \"+(src|test|schemas)/**/*.+(ts|js|json)|command-snapshot.json\"",
+      "command": "prettier --write \"+(src|test|schemas)/**/*.+(ts|js|json)\"",
       "files": [
         "src/**/*.ts",
         "test/**/*.ts",
         "schemas/**/*.json",
-        "command-snapshot.json",
         ".prettier*"
       ],
       "output": []
@@ -136,9 +123,7 @@
         "test:compile",
         "test:only",
         "test:command-reference",
-        "test:deprecation-policy",
         "lint",
-        "test:json-schema",
         "link-check"
       ]
     },
@@ -167,24 +152,6 @@
       "output": [
         "tmp/root"
       ]
-    },
-    "test:deprecation-policy": {
-      "command": "node --loader ts-node/esm --no-warnings=ExperimentalWarning \"./bin/dev.js\" snapshot:compare",
-      "files": [
-        "src/**/*.ts"
-      ],
-      "output": [],
-      "dependencies": [
-        "compile"
-      ]
-    },
-    "test:json-schema": {
-      "command": "node --loader ts-node/esm --no-warnings=ExperimentalWarning \"./bin/dev.js\" schema:compare",
-      "files": [
-        "src/**/*.ts",
-        "schemas"
-      ],
-      "output": []
     },
     "link-check": {
       "command": "node -e \"process.exit(process.env.CI ? 0 : 1)\" || linkinator \"**/*.md\" --skip \"CHANGELOG.md|node_modules|test/|confluence.internal.salesforce.com|my.salesforce.com|localhost|%s\" --markdown --retry --directory-listing --verbosity error",
