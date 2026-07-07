@@ -89,10 +89,9 @@
       "clean": "if-file-deleted"
     },
     "format": {
-      "command": "prettier --write \"+(src|schemas)/**/*.+(ts|js|json)\"",
+      "command": "prettier --write \"src/**/*.+(ts|js|json)\"",
       "files": [
         "src/**/*.ts",
-        "schemas/**/*.json",
         ".prettier*"
       ],
       "output": []
