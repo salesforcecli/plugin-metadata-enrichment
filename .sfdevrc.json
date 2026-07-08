@@ -1,0 +1,21 @@
+{
+  "scripts": {
+    "fix-license": "eslint src --fix --rule \"header/header: [2]\""
+  },
+  "exclude-scripts": ["test:only", "test:compile", "test:deprecation-policy", "test:json-schema"],
+  "wireit": {
+    "lint": {
+      "command": "eslint src --color --cache --cache-location .eslintcache",
+      "files": ["src/**/*.ts", "messages/**", "**/.eslint*", "**/tsconfig.json"],
+      "output": []
+    },
+    "format": {
+      "command": "prettier --write \"src/**/*.+(ts|js|json)\"",
+      "files": ["src/**/*.ts", ".prettier*"],
+      "output": []
+    },
+    "test": {
+      "dependencies": ["test:command-reference", "lint", "link-check"]
+    }
+  }
+}

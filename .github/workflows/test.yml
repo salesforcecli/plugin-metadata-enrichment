@@ -9,100 +9,14 @@ on:
 jobs:
   yarn-lockfile-check:
     uses: salesforcecli/github-workflows/.github/workflows/lockFileCheck.yml@main
-  # Since the Windows unit tests take much longer, we run the linux unit tests first and then run the windows unit tests in parallel with NUTs
+  # Since the Windows unit tests take much longer, we run the linux unit tests first and then run the windows unit tests
   linux-unit-tests:
     needs: yarn-lockfile-check
     uses: salesforcecli/github-workflows/.github/workflows/unitTestsLinux.yml@main
   windows-unit-tests:
     needs: linux-unit-tests
     uses: salesforcecli/github-workflows/.github/workflows/unitTestsWindows.yml@main
-  nuts:
-    needs: linux-unit-tests
-    uses: salesforcecli/github-workflows/.github/workflows/nut.yml@main
-    secrets: inherit
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        command: ['yarn test:nuts']
-      fail-fast: false
-    with:
-      os: ${{ matrix.os }}
-      command: ${{ matrix.command}}
-
-  # The "pilot org perm disabled" NUT needs a SECOND JWT-authed org without the
-  # MetadataAiEnrichmentPilot perm, in addition to the primary one. The upstream
-  # reusable workflow (nut.yml@main) only forwards a fixed list of TESTKIT_*
-  # secrets, so TESTKIT_NON_PILOT_* would never reach the test process through
-  # that path.
-  #
-  # We mirror nut.yml@main's steps inline using its composite actions
-  # (retry@main, yarnInstallWithRetries@main) so we keep the upstream
-  # retry/cache/install conventions, and inject the extra non-pilot secrets as
-  # env on the NUT step. Linux-only because this single test runs against one
-  # stable org and doesn't need cross-OS coverage.
-  nuts-pilot-perm-disabled:
-    needs: linux-unit-tests
-    if: github.repository == 'salesforcecli/plugin-metadata-enrichment'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: google/wireit@setup-github-actions-caching/v2
-        continue-on-error: true
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: yarn
-
-      - name: Cache node modules
-        id: cache-nodemodules
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: add CLI as global dependency
-        uses: salesforcecli/github-workflows/.github/actions/retry@main
-        with:
-          max_attempts: 3
-          command: npm install @salesforce/cli@nightly -g
-
-      - uses: salesforcecli/github-workflows/.github/actions/yarnInstallWithRetries@main
-        if: ${{ steps.cache-nodemodules.outputs.cache-hit != 'true' }}
-
-      # Mirror upstream nut.yml's temporary wireit pin workaround
-      - name: Install wireit
-        run: yarn add wireit@^0.14.12
-
-      - run: yarn compile
-
-      - name: Check that oclif config exists
-        id: is-oclif-plugin
-        run: echo "bool=$(jq 'if .oclif then true else false end' package.json)" >> "$GITHUB_OUTPUT"
-
-      - run: yarn oclif manifest
-        if: ${{ steps.is-oclif-plugin.outputs.bool == 'true' }}
-
-      - name: NUTs with 3 attempts
-        uses: salesforcecli/github-workflows/.github/actions/retry@main
-        with:
-          max_attempts: 3
-          command: yarn test:nuts --grep "pilot org perm disabled"
-          retry_on: error
-        env:
-          # primary org — testkit's outer before() does the JWT login with these
-          TESTKIT_HUB_USERNAME: ${{ secrets.TESTKIT_HUB_USERNAME }}
-          TESTKIT_JWT_CLIENT_ID: ${{ secrets.TESTKIT_JWT_CLIENT_ID }}
-          TESTKIT_HUB_INSTANCE: ${{ secrets.TESTKIT_HUB_INSTANCE }}
-          TESTKIT_JWT_KEY: ${{ secrets.TESTKIT_JWT_KEY }}
-          # second org without the pilot perm — used only by this describe block
-          TESTKIT_NON_PILOT_HUB_USERNAME: ${{ secrets.TESTKIT_NON_PILOT_HUB_USERNAME }}
-          TESTKIT_NON_PILOT_JWT_CLIENT_ID: ${{ secrets.TESTKIT_NON_PILOT_JWT_CLIENT_ID }}
-          TESTKIT_NON_PILOT_HUB_INSTANCE: ${{ secrets.TESTKIT_NON_PILOT_HUB_INSTANCE }}
-          TESTKIT_NON_PILOT_JWT_KEY: ${{ secrets.TESTKIT_NON_PILOT_JWT_KEY }}
-          TESTKIT_SETUP_RETRIES: 2
-          SF_DISABLE_TELEMETRY: true
-          DEBUG: ${{ vars.DEBUG }}
+  # NUTs (integration tests) were removed along with the retired `sf metadata enrich`
+  # command: this plugin is now a command-less tombstone with no *.nut.ts files, so
+  # `yarn test:nuts` had nothing to run and the org-authed nuts jobs failed on
+  # "No test files found". See W-23123159.

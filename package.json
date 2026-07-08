@@ -4,22 +4,10 @@
   "version": "0.1.3",
   "author": "Salesforce",
   "bugs": "https://github.com/forcedotcom/cli/issues",
-  "dependencies": {
-    "@oclif/core": "^4",
-    "@oclif/multi-stage-output": "^0.8.30",
-    "@oclif/table": "^0.5.1",
-    "@salesforce/core": "^8.24.3",
-    "@salesforce/kit": "^3.2.4",
-    "@salesforce/metadata-enrichment": "^0.0.18",
-    "@salesforce/sf-plugins-core": "^12",
-    "@salesforce/source-deploy-retrieve": "^12.35.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@oclif/plugin-command-snapshot": "^5.3.8",
-    "@salesforce/cli-plugins-testkit": "^5.3.57",
     "@salesforce/dev-scripts": "^11.0.4",
     "@salesforce/plugin-command-reference": "^3.1.79",
-    "@salesforce/source-testkit": "^2.2.172",
     "eslint-plugin-sf-plugin": "^1.20.33",
     "oclif": "^4.22.59",
     "ts-node": "^10.9.2",
@@ -30,11 +18,9 @@
   },
   "files": [
     "/lib",
-    "/messages",
     "/npm-shrinkwrap.json",
     "/oclif.lock",
-    "/oclif.manifest.json",
-    "/schemas"
+    "/oclif.manifest.json"
   ],
   "homepage": "https://github.com/salesforcecli/plugin-metadata-enrichment",
   "keywords": [
@@ -53,14 +39,9 @@
     "topicSeparator": " ",
     "devPlugins": [
       "@oclif/plugin-help",
-      "@oclif/plugin-command-snapshot",
       "@salesforce/plugin-command-reference"
     ],
-    "topics": {
-      "metadata": {
-        "description": "Commands to enrich metadata for Salesforce resources"
-      }
-    },
+    "topics": {},
     "flexibleTaxonomy": true
   },
   "resolutions": {
@@ -73,7 +54,7 @@
     "clean-all": "sf-clean all",
     "compile": "wireit",
     "docs": "sf-docs",
-    "fix-license": "eslint src test --fix --rule \"header/header: [2]\"",
+    "fix-license": "eslint src --fix --rule \"header/header: [2]\"",
     "format": "wireit",
     "link-check": "wireit",
     "lint": "wireit",
@@ -81,8 +62,6 @@
     "prepack": "sf-prepack",
     "prepare": "sf-install",
     "test": "wireit",
-    "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
-    "test:only": "wireit",
     "version": "oclif readme"
   },
   "publishConfig": {
@@ -109,60 +88,29 @@
       "clean": "if-file-deleted"
     },
     "format": {
-      "command": "prettier --write \"+(src|test|schemas)/**/*.+(ts|js|json)|command-snapshot.json\"",
+      "command": "prettier --write \"src/**/*.+(ts|js|json)\"",
       "files": [
         "src/**/*.ts",
-        "test/**/*.ts",
-        "schemas/**/*.json",
-        "command-snapshot.json",
         ".prettier*"
       ],
       "output": []
     },
     "lint": {
-      "command": "eslint src test --color --cache --cache-location .eslintcache",
+      "command": "eslint src --color --cache --cache-location .eslintcache",
       "files": [
         "src/**/*.ts",
-        "test/**/*.ts",
         "messages/**",
         "**/.eslint*",
         "**/tsconfig.json"
       ],
       "output": []
     },
-    "test:compile": {
-      "command": "tsc -p \"./test\" --pretty",
-      "files": [
-        "test/**/*.ts",
-        "**/tsconfig.json"
-      ],
-      "output": []
-    },
     "test": {
       "dependencies": [
-        "test:compile",
-        "test:only",
         "test:command-reference",
-        "test:deprecation-policy",
         "lint",
-        "test:json-schema",
         "link-check"
       ]
-    },
-    "test:only": {
-      "command": "nyc mocha \"test/**/*.test.ts\"",
-      "env": {
-        "FORCE_COLOR": "2"
-      },
-      "files": [
-        "test/**/*.ts",
-        "src/**/*.ts",
-        "**/tsconfig.json",
-        ".mocha*",
-        "!*.nut.ts",
-        ".nycrc"
-      ],
-      "output": []
     },
     "test:command-reference": {
       "command": "node --loader ts-node/esm --no-warnings=ExperimentalWarning \"./bin/dev.js\" commandreference:generate --erroronwarnings",
@@ -174,24 +122,6 @@
       "output": [
         "tmp/root"
       ]
-    },
-    "test:deprecation-policy": {
-      "command": "node --loader ts-node/esm --no-warnings=ExperimentalWarning \"./bin/dev.js\" snapshot:compare",
-      "files": [
-        "src/**/*.ts"
-      ],
-      "output": [],
-      "dependencies": [
-        "compile"
-      ]
-    },
-    "test:json-schema": {
-      "command": "node --loader ts-node/esm --no-warnings=ExperimentalWarning \"./bin/dev.js\" schema:compare",
-      "files": [
-        "src/**/*.ts",
-        "schemas"
-      ],
-      "output": []
     },
     "link-check": {
       "command": "node -e \"process.exit(process.env.CI ? 0 : 1)\" || linkinator \"**/*.md\" --skip \"CHANGELOG.md|node_modules|test/|confluence.internal.salesforce.com|my.salesforce.com|localhost|%s\" --markdown --retry --directory-listing --verbosity error",
